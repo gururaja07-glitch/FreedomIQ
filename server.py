@@ -2,26 +2,22 @@ from tools.portfolio import get_portfolio
 from tools.market import update_prices
 from tools.analytics import calculate_metrics
 from tools.report import print_summary
+from tools.charts import allocation_chart, top_holdings_chart
+from tools.sector_analysis import add_sector, sector_summary
+from tools.health import health_score
 
-# Read portfolio
 df = get_portfolio()
-
-# Get today's market prices
 df = update_prices(df)
-
-# Calculate metrics
 df = calculate_metrics(df)
 
-# Show complete portfolio
-print(df)
+df = add_sector(df)
 
-print()
+print_summary(df)
 
-# Show summary
-print_summary(df)
-from tools.charts import allocation_chart, top_holdings_chart
-print_summary(df)
-print(df[["Stock", "Current Value"]])
-print("\nChecking Current Value...\n")
+sector_summary(df)
+
+health_score(df)
+
 allocation_chart(df)
+
 top_holdings_chart(df)
