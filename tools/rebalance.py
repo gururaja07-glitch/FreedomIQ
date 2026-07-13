@@ -1,29 +1,99 @@
-# BUSINESS RULE
-# Cash is considered part of the portfolio.
-# Selling a stock increases cash but does not reduce total portfolio value.
-from tools.rules import MAX_STOCK_WEIGHT
+"""
+FreedomIQ
 
-def rebalance_portfolio(df):
+Module : Rebalancing
 
-    total_portfolio = df["Current Value"].sum()
+Purpose :
+Suggests portfolio rebalancing actions.
 
-    overweight = df[df["Weight %"] > MAX_STOCK_WEIGHT]
+Author : Gururaj N K
+Version : 0.1
+"""
 
-    print("=" * 40)
-    print("REBALANCING ADVISOR")
-    print("=" * 40)
+from tools.portfolio_utils import (
+    calculate_largest_holding,
+    calculate_sector_weights
+)
 
-    for index, row in overweight.iterrows():
+from tools.rules import (
+    MAX_STOCK_WEIGHT,
+    MAX_SECTOR_WEIGHT
+)
 
-        target_value = total_portfolio * MAX_STOCK_WEIGHT / 100
+def rebalance_stock(df):
 
-        sell_amount = row["Current Value"] - target_value
+    largest_holding = calculate_largest_holding(df)
 
-        print("-" * 40)
-        print(f'Stock           : {row["Stock"]}')
-        print(f'Current Weight  : {row["Weight %"]:.2f}%')
-        print(f'Target Weight   : {MAX_STOCK_WEIGHT:.2f}%')
-        print(f'Sell Amount     : ₹{sell_amount:,.2f}')
+    stock = largest_holding["Stock"]
+    weight = largest_holding["Weight %"]
 
-    print("=" * 40)
-   
+    if weight <= MAX_STOCK_WEIGHT:
+        return None
+
+    excess = weight - MAX_STOCK_WEIGHT
+
+    return {
+        "Type": "Stock",
+        "Name": stock,
+        "Current Weight": weight,
+        "Target Weight": MAX_STOCK_WEIGHT,
+        "Excess": excess
+    }
+
+def rebalance_sector(df):
+
+    sector_weights = calculate_sector_weights(df)
+
+    largest_sector = sector_weights.idxmax()
+    largest_weight = sector_weights.max()
+
+    if largest_weight <= MAX_SECTOR_WEIGHT:
+        return None
+
+    excess = largest_weight - MAX_SECTOR_WEIGHT
+
+    return {
+        "Type": "Sector",
+        "Name": largest_sector,
+        "Current Weight": largest_weight,
+        "Target Weight": MAX_SECTOR_WEIGHT,
+        "Excess": excess
+    }
+
+def calculate_rebalancing(df):
+
+    actions = []
+
+    stock_action = rebalance_stock(df)
+
+    if stock_action:
+        actions.append(stock_action)
+
+    sector_action = rebalance_sector(df)
+
+    if sector_action:
+        actions.append(sector_action)
+
+    return actions
+
+def print_rebalancing(actions):
+
+    print()
+    print("=" * 50)
+    print("REBALANCING SUGGESTIONS")
+    print("=" * 50)
+
+    if not actions:
+
+        print("Portfolio is well balanced.")
+
+    else:
+
+        for action in actions:
+
+            print(f'Type            : {action["Type"]}')
+            print(f'Name            : {action["Name"]}')
+            print(f'Current Weight  : {action["Current Weight"]:.2f}%')
+            print(f'Target Weight   : {action["Target Weight"]:.2f}%')
+            print(f'Excess          : {action["Excess"]:.2f}%')
+            print("-" * 50)

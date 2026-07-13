@@ -7,7 +7,10 @@ from tools.risk import (
     calculate_risk,
     print_risk
 )
-
+from tools.rebalance import (
+    calculate_rebalancing,
+    print_rebalancing
+)
 from tools.sector_analysis import (
     add_sector,
     calculate_sector_summary,
@@ -93,4 +96,8 @@ risk = calculate_risk(
 )
 
 print_risk(risk)
+
+actions = calculate_rebalancing(df)
+
+print_rebalancing(actions)
 
