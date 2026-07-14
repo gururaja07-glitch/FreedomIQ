@@ -1,28 +1,19 @@
 import matplotlib.pyplot as plt
 
-def allocation_chart(df):
 
-    # Keep only rows with valid Current Value
-    chart_df = df.dropna(subset=["Current Value"])
+def portfolio_pie_chart(df):
 
-    # Remove zero or negative values
-    chart_df = chart_df[chart_df["Current Value"] > 0]
+    fig, ax = plt.subplots(figsize=(6,6))
 
-    plt.figure(figsize=(8, 8))
-
-    plt.pie(
-        chart_df["Current Value"],
-        labels=chart_df["Stock"],
+    ax.pie(
+        df["Current Value"],
+        labels=df["Stock"],
         autopct="%1.1f%%"
     )
 
-    plt.title("Portfolio Allocation")
+    ax.set_title("Portfolio Allocation")
 
-    plt.savefig("charts/allocation.png")
-
-    plt.close()
-
-    print("✅ Chart saved to charts/allocation.png")
+    return fig
 
 
 def top_holdings_chart(df):
@@ -32,21 +23,17 @@ def top_holdings_chart(df):
         ascending=False
     ).head(10)
 
-    plt.figure(figsize=(10, 6))
+    fig, ax = plt.subplots(figsize=(10,6))
 
-    plt.bar(
+    ax.bar(
         top["Stock"],
         top["Current Value"]
     )
 
     plt.xticks(rotation=45)
 
-    plt.title("Top 10 Holdings")
+    ax.set_title("Top 10 Holdings")
 
     plt.tight_layout()
 
-    plt.savefig("charts/top_holdings.png")
-
-    plt.close()
-
-    print("✅ Top holdings chart saved")
+    return fig
