@@ -1,7 +1,7 @@
 import streamlit as st
 
 # ==========================================
-# Backend Imports
+# Backend
 # ==========================================
 
 from tools.portfolio import get_portfolio
@@ -11,9 +11,13 @@ from tools.sector_analysis import add_sector
 from tools.summary import calculate_portfolio_summary
 from tools.health import calculate_health_score
 from tools.rebalance import calculate_rebalancing
+from tools.performance import (
+    calculate_top_performers,
+    calculate_top_losers
+)
 
 # ==========================================
-# Utility Imports
+# Utilities
 # ==========================================
 
 from tools.charts import (
@@ -22,7 +26,7 @@ from tools.charts import (
 )
 
 # ==========================================
-# UI Imports
+# UI
 # ==========================================
 
 from ui.dashboard import show_metrics
@@ -30,7 +34,7 @@ from ui.summary import show_summary
 from ui.recommendations import show_recommendations
 
 # ==========================================
-# Streamlit Page Configuration
+# Page Config
 # ==========================================
 
 st.set_page_config(
@@ -64,22 +68,30 @@ with st.sidebar:
     st.write("♻️ Rebalancing")
 
 # ==========================================
-# Load Portfolio
+# Portfolio Loader
 # ==========================================
+
+@st.cache_data(ttl=300)
+def load_portfolio():
+
+    df = get_portfolio()
+
+    df = update_prices(df)
+
+    df = calculate_metrics(df)
+
+    df = add_sector(df)
+
+    return df
+
 
 cash = 450000
 gold = 650000
 
-df = get_portfolio()
-
-df = update_prices(df)
-
-df = calculate_metrics(df)
-
-df = add_sector(df)
+df = load_portfolio()
 
 # ==========================================
-# Portfolio Summary
+# Summary
 # ==========================================
 
 summary = calculate_portfolio_summary(
@@ -89,7 +101,7 @@ summary = calculate_portfolio_summary(
 )
 
 # ==========================================
-# Health Score
+# Health
 # ==========================================
 
 total_portfolio = (
@@ -109,42 +121,38 @@ health = calculate_health_score(
 )
 
 # ==========================================
-# Rebalancing Suggestions
+# Rebalancing
 # ==========================================
 
 actions = calculate_rebalancing(df)
 
 # ==========================================
-# Dashboard Title
+# Performance
+# ==========================================
+
+top_winners = calculate_top_performers(df)
+
+top_losers = calculate_top_losers(df)
+
+# ==========================================
+# Dashboard
 # ==========================================
 
 st.title("📈 FreedomIQ")
 
 st.caption("AI Powered Portfolio Analytics")
 
-# ==========================================
-# KPI Cards
-# ==========================================
-
 show_metrics(
     summary,
     health
 )
 
-# ==========================================
-# Portfolio Summary
-# ==========================================
-
 show_summary(summary)
-
-# ==========================================
-# Recommendations
-# ==========================================
 
 show_recommendations(actions)
 
 # ==========================================
-# Portfolio Allocation Chart
+# Portfolio Allocation
 # ==========================================
 
 st.divider()
@@ -156,7 +164,7 @@ fig = portfolio_pie_chart(df)
 st.pyplot(fig)
 
 # ==========================================
-# Top Holdings Chart
+# Top Holdings
 # ==========================================
 
 st.divider()
@@ -168,7 +176,7 @@ fig = top_holdings_chart(df)
 st.pyplot(fig)
 
 # ==========================================
-# Portfolio Table
+# Portfolio Holdings
 # ==========================================
 
 st.divider()
@@ -208,3 +216,37 @@ st.dataframe(
     portfolio,
     use_container_width=True
 )
+
+# ==========================================
+# Performance
+# ==========================================
+
+st.divider()
+
+st.subheader("🏆 Performance")
+
+left, right = st.columns(2)
+
+with left:
+
+    st.success("🏆 Top Winners")
+
+    for _, row in top_winners.iterrows():
+
+        st.write(
+            f"**{row['Stock']}**  "
+            f"₹{row['Profit']:,.0f}  "
+            f"({row['Return %']:.2f}%)"
+        )
+
+with right:
+
+    st.error("📉 Top Losers")
+
+    for _, row in top_losers.iterrows():
+
+        st.write(
+            f"**{row['Stock']}**  "
+            f"₹{row['Profit']:,.0f}  "
+            f"({row['Return %']:.2f}%)"
+        )
