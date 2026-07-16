@@ -14,16 +14,12 @@ import streamlit as st
 
 
 def show_health(health):
-    """
-    Display portfolio health.
-    """
 
     st.subheader("❤️ Portfolio Health")
 
     col1, col2 = st.columns([3, 1])
 
     with col1:
-
         st.metric(
             "Overall Health",
             f'{health["Total"]:.0f}/100'
@@ -33,13 +29,10 @@ def show_health(health):
 
         if health["Total"] >= 90:
             rating = "🟢 Excellent"
-
         elif health["Total"] >= 75:
             rating = "🟡 Good"
-
         elif health["Total"] >= 60:
             rating = "🟠 Average"
-
         else:
             rating = "🔴 Poor"
 

@@ -2,11 +2,13 @@ import streamlit as st
 
 from tools.portfolio import get_portfolio
 from tools.market import update_prices
+from ui.health import show_health
 from tools.analytics import (
     calculate_metrics,
     calculate_portfolio_summary,
 )
 from ui.dashboard import show_metrics
+from ui.risk import show_risk
 
 st.set_page_config(
     page_title="FreedomIQ",
