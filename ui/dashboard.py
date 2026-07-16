@@ -3,43 +3,49 @@ import streamlit as st
 from tools.formatter import format_money
 
 
-def show_metrics(summary, health):
+def show_metrics(summary, health, risk_level):
+    """
+    Display top dashboard metrics.
+    """
 
-    col1, col2, col3 = st.columns(3)
+    cols = st.columns(8)
 
-    with col1:
+    cols[0].metric(
+        "💰 Investment",
+        format_money(summary["Investment"])
+    )
 
-        st.metric(
-            "Investment",
-            format_money(summary["Investment"])
-        )
+    cols[1].metric(
+        "📈 Portfolio",
+        format_money(summary["Current Value"])
+    )
 
-    with col2:
+    cols[2].metric(
+        "💵 Profit",
+        format_money(summary["Profit"])
+    )
 
-        st.metric(
-            "Current Value",
-            format_money(summary["Current Value"])
-        )
+    cols[3].metric(
+        "📊 Return",
+        f'{summary["Return %"]:.2f}%'
+    )
 
-    with col3:
+    cols[4].metric(
+        "📦 Stocks",
+        summary["Number of Stocks"]
+    )
 
-        st.metric(
-            "Return",
-            f'{summary["Return %"]:.2f}%'
-        )
+    cols[5].metric(
+        "🏆 Largest",
+        summary["Largest Holding"]
+    )
 
-    col4, col5 = st.columns(2)
+    cols[6].metric(
+        "❤️ Health",
+        f'{health["Total"]:.0f}/100'
+    )
 
-    with col4:
-
-        st.metric(
-            "Health Score",
-            f'{health["Total"]:.2f}/100'
-        )
-
-    with col5:
-
-        st.metric(
-            "Risk",
-            "HIGH"
-        )
+    cols[7].metric(
+        "⚠️ Risk",
+        risk_level
+    )

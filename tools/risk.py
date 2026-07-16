@@ -9,9 +9,16 @@ Identifies portfolio risks.
 Author : Gururaj N K
 Version : 0.1
 """
-from tools.rules import MAX_STOCK_WEIGHT
-from tools.portfolio_utils import calculate_largest_holding
-from tools.rules import MAX_STOCK_WEIGHT
+from tools.portfolio_utils import (
+    calculate_largest_holding,
+    calculate_sector_weights,
+)
+from tools.rules import (
+    MAX_SECTOR_WEIGHT,
+    MAX_STOCK_WEIGHT,
+    TARGET_CASH_WEIGHT,
+    TARGET_GOLD_WEIGHT,
+)
 
 
 def calculate_concentration_risk(df):
@@ -38,9 +45,6 @@ def calculate_concentration_risk(df):
         f"by {excess:.2f}%."
     )
 
-from tools.portfolio_utils import calculate_sector_weights
-from tools.rules import MAX_SECTOR_WEIGHT
-
 
 def calculate_sector_risk(df):
 
@@ -64,18 +68,6 @@ def calculate_sector_risk(df):
         f"{sector} sector exceeds the limit "
         f"by {excess:.2f}%."
     )
-from tools.portfolio_utils import (
-    calculate_largest_holding,
-    calculate_sector_weights
-)
-
-from tools.rules import (
-    MAX_STOCK_WEIGHT,
-    MAX_SECTOR_WEIGHT
-)
-
-
-from tools.rules import TARGET_CASH_WEIGHT
 
 
 def calculate_cash_risk(cash_weight):
@@ -83,18 +75,16 @@ def calculate_cash_risk(cash_weight):
     if cash_weight >= TARGET_CASH_WEIGHT:
 
         return (
-            "LOW",
+            "Low",
             f"Cash allocation is healthy ({cash_weight:.2f}%)."
         )
 
     shortage = TARGET_CASH_WEIGHT - cash_weight
 
     return (
-        "HIGH",
+        "High",
         f"Cash allocation is below target by {shortage:.2f}%."
     )
-
-from tools.rules import TARGET_GOLD_WEIGHT
 
 
 def calculate_gold_risk(gold_weight):
@@ -102,16 +92,17 @@ def calculate_gold_risk(gold_weight):
     if gold_weight >= TARGET_GOLD_WEIGHT:
 
         return (
-            "LOW",
+            "Low",
             f"Gold allocation is healthy ({gold_weight:.2f}%)."
         )
 
     shortage = TARGET_GOLD_WEIGHT - gold_weight
 
     return (
-        "HIGH",
+        "High",
         f"Gold allocation is below target by {shortage:.2f}%."
     )
+
 
 def calculate_risk(df, cash_weight, gold_weight):
 
@@ -131,6 +122,7 @@ def calculate_risk(df, cash_weight, gold_weight):
     }
 
     return risk
+
 
 def print_risk(risk):
 

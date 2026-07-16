@@ -1,13 +1,19 @@
 def calculate_metrics(df):
+    """
+    Calculate investment metrics for each holding.
+    """
 
-    df["Investment"] = df["Quantity"] * df["BuyPrice"]
+    df["Investment"] = (
+        df["Quantity"] * df["BuyPrice"]
+    )
 
     df["Current Value"] = (
         df["Quantity"] * df["CurrentPrice"]
     )
 
     df["Profit"] = (
-        df["Current Value"] - df["Investment"]
+        df["Current Value"] -
+        df["Investment"]
     )
 
     df["Return %"] = (
@@ -21,3 +27,39 @@ def calculate_metrics(df):
     ).round(2)
 
     return df
+
+
+def calculate_portfolio_summary(df):
+    """
+    Returns overall portfolio statistics.
+    """
+
+    investment = df["Investment"].sum()
+    current_value = df["Current Value"].sum()
+    profit = current_value - investment
+
+    if investment == 0:
+        return_percent = 0
+    else:
+        return_percent = round(
+            profit / investment * 100,
+            2
+        )
+
+    largest = df.loc[
+        df["Current Value"].idxmax()
+    ]
+
+    summary = {
+        "Investment": round(investment, 2),
+        "Current Value": round(current_value, 2),
+        "Profit": round(profit, 2),
+        "Return %": return_percent,
+        "Number of Stocks": len(df),
+        "Largest Holding": largest["Stock"],
+        "Largest Weight": round(
+            largest["Weight %"], 2
+        ),
+    }
+
+    return summary

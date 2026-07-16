@@ -1,14 +1,12 @@
+from tools.analytics import calculate_portfolio_summary
+
+
 def print_summary(df):
+    """
+    Print portfolio summary.
+    """
 
-    investment = df["Investment"].sum()
-    current = df["Current Value"].sum()
-    profit = df["Profit"].sum()
-    returns = (profit / investment * 100)
-
-    top = df.sort_values(
-        "Current Value",
-        ascending=False
-    ).iloc[0]
+    summary = calculate_portfolio_summary(df)
 
     best = df.sort_values(
         "Return %",
@@ -20,19 +18,31 @@ def print_summary(df):
         ascending=True
     ).iloc[0]
 
-    print("=" * 50)
-    print("          PORTFOLIO SUMMARY")
-    print("=" * 50)
+    print("=" * 55)
+    print("              FREEDOMIQ PORTFOLIO")
+    print("=" * 55)
 
-    print(f"Investment     : ₹ {investment:,.2f}")
-    print(f"Current Value  : ₹ {current:,.2f}")
-    print(f"Profit         : ₹ {profit:,.2f}")
-    print(f"Return         : {returns:.2f}%")
+    print(f"Total Investment : ₹ {summary['Investment']:,.2f}")
+    print(f"Current Value    : ₹ {summary['Current Value']:,.2f}")
+    print(f"Overall Profit   : ₹ {summary['Profit']:,.2f}")
+    print(f"Overall Return   : {summary['Return %']:.2f}%")
 
     print()
 
-    print(f"Top Holding    : {top['Stock']} ({top['Weight %']}%)")
-    print(f"Best Performer : {best['Stock']} ({best['Return %']}%)")
-    print(f"Worst Performer: {worst['Stock']} ({worst['Return %']}%)")
+    print(f"Number of Stocks : {summary['Number of Stocks']}")
+    print(f"Largest Holding  : {summary['Largest Holding']}")
+    print(f"Holding Weight   : {summary['Largest Weight']:.2f}%")
 
-    print("=" * 50)
+    print()
+
+    print(
+        f"Best Performer   : "
+        f"{best['Company']} ({best['Return %']:.2f}%)"
+    )
+
+    print(
+        f"Worst Performer  : "
+        f"{worst['Company']} ({worst['Return %']:.2f}%)"
+    )
+
+    print("=" * 55)
