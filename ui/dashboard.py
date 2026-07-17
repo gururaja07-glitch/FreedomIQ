@@ -17,7 +17,8 @@ def show_metrics(summary, health, risk_level):
 
     cols[1].metric(
         "📈 Portfolio",
-        format_money(summary["Current Value"])
+        format_money(summary["Current Value"]),
+        f'{summary["Return %"]:.2f}%'
     )
 
     cols[2].metric(
@@ -37,7 +38,8 @@ def show_metrics(summary, health, risk_level):
 
     cols[5].metric(
         "🏆 Largest",
-        summary["Largest Holding"]
+        summary["Largest Holding"],
+        f'{summary["Largest Weight"]:.2f}%'
     )
 
     cols[6].metric(

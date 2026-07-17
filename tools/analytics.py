@@ -94,3 +94,56 @@ def calculate_asset_allocation(df):
         "Silver": silver,
         "Cash": cash,
     }
+
+
+def calculate_portfolio_insights(df):
+    """
+    Returns important portfolio insights.
+    """
+
+    best = df.loc[df["Return %"].idxmax()]
+    worst = df.loc[df["Return %"].idxmin()]
+    largest = df.loc[df["Weight %"].idxmax()]
+
+    insights = {
+        "Best Performer": best["Stock"],
+        "Best Return": round(best["Return %"], 2),
+
+        "Worst Performer": worst["Stock"],
+        "Worst Return": round(worst["Return %"], 2),
+
+        "Largest Holding": largest["Stock"],
+        "Largest Weight": round(largest["Weight %"], 2),
+    }
+
+    return insights
+
+
+def get_top_performers(df, top_n=3):
+    """
+    Returns the top performing stocks.
+    """
+
+    return (
+        df.sort_values(
+            by="Return %",
+            ascending=False
+        )
+        .head(top_n)[["Stock", "Return %"]]
+        .reset_index(drop=True)
+    )
+
+
+def get_top_losers(df, top_n=3):
+    """
+    Returns the worst performing stocks.
+    """
+
+    return (
+        df.sort_values(
+            by="Return %",
+            ascending=True
+        )
+        .head(top_n)[["Stock", "Return %"]]
+        .reset_index(drop=True)
+    )

@@ -6,6 +6,9 @@ from tools.analytics import (
     calculate_metrics,
     calculate_portfolio_summary,
     calculate_asset_allocation,
+    calculate_portfolio_insights,
+    get_top_performers,
+    get_top_losers,
 )
 
 from tools.charts import (
@@ -38,6 +41,11 @@ df = calculate_metrics(df)
 
 summary = calculate_portfolio_summary(df)
 allocation = calculate_asset_allocation(df)
+insights = calculate_portfolio_insights(df)
+
+# New Analytics
+top_performers = get_top_performers(df)
+top_losers = get_top_losers(df)
 
 # ----------------------------------
 # Summary Cards
@@ -46,6 +54,37 @@ allocation = calculate_asset_allocation(df)
 health = {"Total": 100}
 
 show_metrics(summary, health, "Low")
+
+st.divider()
+
+# ----------------------------------
+# Portfolio Insights
+# ----------------------------------
+
+st.subheader("📊 Portfolio Insights")
+
+col1, col2, col3 = st.columns(3)
+
+with col1:
+    st.metric(
+        "🏆 Best Performer",
+        insights["Best Performer"],
+        f'{insights["Best Return"]:.2f}%'
+    )
+
+with col2:
+    st.metric(
+        "📉 Worst Performer",
+        insights["Worst Performer"],
+        f'{insights["Worst Return"]:.2f}%'
+    )
+
+with col3:
+    st.metric(
+        "⚖ Largest Holding",
+        insights["Largest Holding"],
+        f'{insights["Largest Weight"]:.2f}%'
+    )
 
 st.divider()
 
