@@ -35,7 +35,6 @@ st.caption("Personal Portfolio Dashboard")
 df = get_portfolio()
 df = update_prices(df)
 df = calculate_metrics(df)
-st.write(df[["Stock", "Sector", "Current Value"]])
 
 summary = calculate_portfolio_summary(df)
 allocation = calculate_asset_allocation(df)
