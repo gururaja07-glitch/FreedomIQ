@@ -5,12 +5,14 @@ from tools.market import update_prices
 from tools.analytics import (
     calculate_metrics,
     calculate_portfolio_summary,
+    calculate_asset_allocation,
 )
 
 from tools.charts import (
     portfolio_pie_chart,
     sector_pie_chart,
     top_holdings_chart,
+    asset_allocation_chart,
 )
 
 from ui.dashboard import show_metrics
@@ -33,9 +35,10 @@ st.caption("Personal Portfolio Dashboard")
 df = get_portfolio()
 df = update_prices(df)
 df = calculate_metrics(df)
-
+st.write(df[["Stock", "Sector", "Current Value"]])
 
 summary = calculate_portfolio_summary(df)
+allocation = calculate_asset_allocation(df)
 
 # ----------------------------------
 # Summary Cards
@@ -60,9 +63,25 @@ with col1:
 
 with col2:
     st.pyplot(sector_pie_chart(df))
-    
 
 st.pyplot(top_holdings_chart(df))
+
+st.divider()
+
+# ----------------------------------
+# Asset Allocation
+# ----------------------------------
+
+st.subheader("Asset Allocation")
+
+st.pyplot(
+    asset_allocation_chart(
+        allocation["Equity"],
+        allocation["Gold"],
+        allocation["Silver"],
+        allocation["Cash"],
+    )
+)
 
 st.divider()
 

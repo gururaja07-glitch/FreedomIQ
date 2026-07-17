@@ -63,3 +63,34 @@ def calculate_portfolio_summary(df):
     }
 
     return summary
+
+
+def calculate_asset_allocation(df):
+    """
+    Calculate overall asset allocation.
+    """
+
+    sector = df["Sector"].astype(str).str.strip().str.lower()
+
+    equity = df[
+        ~sector.isin(["gold", "silver", "cash"])
+    ]["Current Value"].sum()
+
+    gold = df[
+        sector == "gold"
+    ]["Current Value"].sum()
+
+    silver = df[
+        sector == "silver"
+    ]["Current Value"].sum()
+
+    cash = df[
+        sector == "cash"
+    ]["Current Value"].sum()
+
+    return {
+        "Equity": equity,
+        "Gold": gold,
+        "Silver": silver,
+        "Cash": cash,
+    }

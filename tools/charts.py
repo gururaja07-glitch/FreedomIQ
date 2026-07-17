@@ -68,3 +68,29 @@ def top_holdings_chart(df):
     plt.tight_layout()
 
     return fig
+
+
+def asset_allocation_chart(equity, gold, silver, cash):
+    """Overall asset allocation."""
+
+    values = [equity, gold, silver, cash]
+
+    labels = [
+        "Equity",
+        "Gold",
+        "Silver",
+        "Cash"
+    ]
+
+    fig, ax = plt.subplots(figsize=(7, 7))
+
+    ax.pie(
+        values,
+        labels=labels,
+        autopct="%1.1f%%",
+        startangle=90
+    )
+
+    ax.set_title("Asset Allocation")
+
+    return fig
