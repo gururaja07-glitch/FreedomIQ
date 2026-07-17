@@ -10,7 +10,7 @@ from tools.analytics import (
     get_top_performers,
     get_top_losers,
 )
-
+from tools.health import calculate_portfolio_health
 from tools.charts import (
     portfolio_pie_chart,
     sector_pie_chart,
@@ -18,7 +18,12 @@ from tools.charts import (
     asset_allocation_chart,
 )
 
-from ui.dashboard import show_metrics
+from ui.dashboard import (
+    show_metrics,
+    show_portfolio_insights,
+    show_top_performers,
+    show_top_losers,
+)
 from ui.health import show_health
 from ui.risk import show_risk
 
@@ -48,43 +53,35 @@ top_performers = get_top_performers(df)
 top_losers = get_top_losers(df)
 
 # ----------------------------------
+# Portfolio Health
+# ----------------------------------
+
+health = calculate_portfolio_health(df, allocation)
+
+# ----------------------------------
 # Summary Cards
 # ----------------------------------
 
-health = {"Total": 100}
-
 show_metrics(summary, health, "Low")
-
-st.divider()
-
 # ----------------------------------
 # Portfolio Insights
 # ----------------------------------
 
-st.subheader("📊 Portfolio Insights")
+show_portfolio_insights(insights)
 
-col1, col2, col3 = st.columns(3)
+st.divider()
+
+# ----------------------------------
+# Top Performers & Top Losers
+# ----------------------------------
+
+col1, col2 = st.columns(2)
 
 with col1:
-    st.metric(
-        "🏆 Best Performer",
-        insights["Best Performer"],
-        f'{insights["Best Return"]:.2f}%'
-    )
+    show_top_performers(top_performers)
 
 with col2:
-    st.metric(
-        "📉 Worst Performer",
-        insights["Worst Performer"],
-        f'{insights["Worst Return"]:.2f}%'
-    )
-
-with col3:
-    st.metric(
-        "⚖ Largest Holding",
-        insights["Largest Holding"],
-        f'{insights["Largest Weight"]:.2f}%'
-    )
+    show_top_losers(top_losers)
 
 st.divider()
 
@@ -122,6 +119,13 @@ st.pyplot(
 )
 
 st.divider()
+st.divider()
+
+# ----------------------------------
+# Portfolio Health
+# ----------------------------------
+
+show_health(health)
 
 # ----------------------------------
 # Holdings

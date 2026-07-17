@@ -1,72 +1,133 @@
 """
 FreedomIQ
 
-Module : Health UI
+Module : Health Engine
 
 Purpose :
-Displays Portfolio Health in Streamlit.
+Calculates Portfolio Health Score.
 
 Author : Gururaj N K
 Version : 0.1
 """
 
-import streamlit as st
+from tools.rules import (
+    MIN_STOCKS,
+    MIN_SECTORS,
+    MAX_STOCK_WEIGHT,
+    TARGET_CASH_WEIGHT,
+    TARGET_GOLD_WEIGHT,
+    MAX_GOLD,
+)
 
 
-def show_health(health):
+def calculate_diversification_score(df):
     """
-    Display portfolio health.
+    Score based on number of holdings.
     """
 
-    st.subheader("❤️ Portfolio Health")
+    stocks = len(df)
 
-    col1, col2 = st.columns([3, 1])
+    if stocks >= MIN_STOCKS:
+        return 20
 
-    with col1:
+    return round((stocks / MIN_STOCKS) * 20)
 
-        st.metric(
-            "Overall Health",
-            f'{health["Total"]:.0f}/100'
-        )
 
-    with col2:
+def calculate_sector_score(df):
+    """
+    Score based on number of sectors.
+    """
 
-        if health["Total"] >= 90:
-            rating = "🟢 Excellent"
+    sectors = df["Sector"].nunique()
 
-        elif health["Total"] >= 75:
-            rating = "🟡 Good"
+    if sectors >= MIN_SECTORS:
+        return 20
 
-        elif health["Total"] >= 60:
-            rating = "🟠 Average"
+    return round((sectors / MIN_SECTORS) * 20)
 
-        else:
-            rating = "🔴 Poor"
 
-        st.metric(
-            "Rating",
-            rating
-        )
+def calculate_stock_concentration_score(df):
+    """
+    Score based on largest holding.
+    """
 
-    health_data = {
-        "Category": [
-            "Diversification",
-            "Concentration",
-            "Sector",
-            "Cash",
-            "Gold"
-        ],
-        "Score": [
-            health["Diversification"],
-            health["Concentration"],
-            health["Sector"],
-            health["Cash"],
-            health["Gold"]
-        ]
-    }
+    largest = df["Weight %"].max()
 
-    st.dataframe(
-        health_data,
-        hide_index=True,
-        use_container_width=True
+    if largest <= MAX_STOCK_WEIGHT:
+        return 20
+
+    excess = largest - MAX_STOCK_WEIGHT
+
+    score = max(0, 20 - round(excess))
+
+    return score
+
+
+def calculate_cash_score(allocation):
+    """
+    Score based on cash allocation.
+    """
+
+    total = sum(allocation.values())
+
+    if total == 0:
+        return 0
+
+    cash_weight = allocation["Cash"] / total * 100
+
+    if cash_weight >= TARGET_CASH_WEIGHT:
+        return 20
+
+    return round(cash_weight / TARGET_CASH_WEIGHT * 20)
+
+
+def calculate_gold_score(allocation):
+    """
+    Score based on gold allocation.
+    """
+
+    total = sum(allocation.values())
+
+    if total == 0:
+        return 0
+
+    gold_weight = allocation["Gold"] / total * 100
+
+    if TARGET_GOLD_WEIGHT <= gold_weight <= MAX_GOLD:
+        return 20
+
+    if gold_weight < TARGET_GOLD_WEIGHT:
+        return round(gold_weight / TARGET_GOLD_WEIGHT * 20)
+
+    excess = gold_weight - MAX_GOLD
+
+    return max(0, 20 - round(excess))
+
+
+def calculate_portfolio_health(df, allocation):
+    """
+    Calculate overall portfolio health.
+    """
+
+    diversification = calculate_diversification_score(df)
+    sector = calculate_sector_score(df)
+    concentration = calculate_stock_concentration_score(df)
+    cash = calculate_cash_score(allocation)
+    gold = calculate_gold_score(allocation)
+
+    total = (
+        diversification +
+        sector +
+        concentration +
+        cash +
+        gold
     )
+
+    return {
+        "Diversification": diversification,
+        "Sector": sector,
+        "Concentration": concentration,
+        "Cash": cash,
+        "Gold": gold,
+        "Total": total,
+    }

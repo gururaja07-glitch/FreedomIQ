@@ -51,3 +51,62 @@ def show_metrics(summary, health, risk_level):
         "⚠️ Risk",
         risk_level
     )
+
+
+def show_portfolio_insights(insights):
+    """
+    Display portfolio insights.
+    """
+
+    st.subheader("📊 Portfolio Insights")
+
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        st.metric(
+            "🏆 Best Performer",
+            insights["Best Performer"],
+            f'{insights["Best Return"]:.2f}%'
+        )
+
+    with col2:
+        st.metric(
+            "📉 Worst Performer",
+            insights["Worst Performer"],
+            f'{insights["Worst Return"]:.2f}%'
+        )
+
+    with col3:
+        st.metric(
+            "⚖ Largest Holding",
+            insights["Largest Holding"],
+            f'{insights["Largest Weight"]:.2f}%'
+        )
+
+
+def show_top_performers(top_performers):
+    """
+    Display top performing stocks.
+    """
+
+    st.subheader("🏆 Top Performers")
+
+    for i, row in top_performers.iterrows():
+        st.metric(
+            f"{i + 1}. {row['Stock']}",
+            f"{row['Return %']:.2f}%"
+        )
+
+
+def show_top_losers(top_losers):
+    """
+    Display worst performing stocks.
+    """
+
+    st.subheader("📉 Top Losers")
+
+    for i, row in top_losers.iterrows():
+        st.metric(
+            f"{i + 1}. {row['Stock']}",
+            f"{row['Return %']:.2f}%"
+        )
