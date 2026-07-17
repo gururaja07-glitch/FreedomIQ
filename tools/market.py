@@ -1,5 +1,6 @@
 import yfinance as yf
 
+
 def update_prices(df):
 
     prices = []
@@ -7,10 +8,11 @@ def update_prices(df):
     for _, row in df.iterrows():
 
         stock = row["Stock"]
+        sector = str(row["Sector"]).strip().lower()
         old_price = row["CurrentPrice"]
 
-        # Skip Sovereign Gold Bonds
-        if stock.upper().startswith("SGB"):
+        # Skip assets that don't have Yahoo Finance quotes
+        if sector in ["gold", "silver", "cash"]:
             prices.append(old_price)
             continue
 
