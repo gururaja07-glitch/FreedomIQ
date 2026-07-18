@@ -59,13 +59,13 @@ top_losers = get_top_losers(df)
 # ----------------------------------
 
 health = calculate_portfolio_health(df, allocation)
-risk = calculate_portfolio_risk(df, allocation)
+risk, overall_risk = calculate_portfolio_risk(df, allocation)
 
 # ----------------------------------
 # Summary Cards
 # ----------------------------------
 
-show_metrics(summary, health, "Calculated")
+show_metrics(summary, health, overall_risk)
 # ----------------------------------
 # Portfolio Insights
 # ----------------------------------

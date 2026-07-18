@@ -109,8 +109,28 @@ def calculate_portfolio_risk(df, allocation):
     Calculate portfolio risk summary.
     """
 
-    return {
-        "Concentration": calculate_concentration_risk(df),
-        "Sector": calculate_sector_risk(df),
-        "Cash": calculate_cash_risk(allocation),
-    }
+    concentration = calculate_concentration_risk(df)
+    sector = calculate_sector_risk(df)
+    cash = calculate_cash_risk(allocation)
+
+    levels = [
+        concentration[0],
+        sector[0],
+        cash[0],
+    ]
+
+    if "High" in levels:
+        overall = "🔴 High"
+    elif "Medium" in levels:
+        overall = "🟡 Medium"
+    else:
+        overall = "🟢 Low"
+
+    return (
+        {
+            "Concentration": concentration,
+            "Sector": sector,
+            "Cash": cash,
+        },
+        overall,
+    )
