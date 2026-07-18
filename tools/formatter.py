@@ -1,13 +1,44 @@
+"""
+FreedomIQ
+
+Module : Formatter
+
+Purpose :
+Common formatting utilities.
+
+Author : Gururaj N K
+Version : 0.2
+"""
+
+
 def format_money(value):
+    """
+    Format Indian currency.
+    """
 
-    if value >= 10000000:
-        return f"₹{value/10000000:.2f} Cr"
+    if value is None:
+        return "-"
 
-    elif value >= 100000:
-        return f"₹{value/100000:.2f} L"
+    return f"₹{value:,.0f}"
 
-    elif value >= 1000:
-        return f"₹{value/1000:.2f} K"
 
-    else:
-        return f"₹{value:.2f}"
+def format_percentage(value):
+    """
+    Format percentage.
+    """
+
+    if value is None:
+        return "-"
+
+    return f"{value:.1f}%"
+
+
+def format_number(value):
+    """
+    Format numbers.
+    """
+
+    if value is None:
+        return "-"
+
+    return f"{value:,.2f}"

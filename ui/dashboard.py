@@ -1,6 +1,6 @@
 import streamlit as st
 
-from tools.formatter import format_money
+from tools.formatter import format_money, format_percentage
 
 
 def show_metrics(summary, health, risk_level):
@@ -18,7 +18,7 @@ def show_metrics(summary, health, risk_level):
     cols[1].metric(
         "📈 Portfolio",
         format_money(summary["Current Value"]),
-        f'{summary["Return %"]:.2f}%'
+        format_percentage(summary["Return %"])
     )
 
     cols[2].metric(
@@ -28,7 +28,7 @@ def show_metrics(summary, health, risk_level):
 
     cols[3].metric(
         "📊 Return",
-        f'{summary["Return %"]:.2f}%'
+        format_percentage(summary["Return %"])
     )
 
     cols[4].metric(
@@ -39,7 +39,7 @@ def show_metrics(summary, health, risk_level):
     cols[5].metric(
         "🏆 Largest",
         summary["Largest Holding"],
-        f'{summary["Largest Weight"]:.2f}%'
+        format_percentage(summary["Largest Weight"])
     )
 
     cols[6].metric(
@@ -66,21 +66,21 @@ def show_portfolio_insights(insights):
         st.metric(
             "🏆 Best Performer",
             insights["Best Performer"],
-            f'{insights["Best Return"]:.2f}%'
+            format_percentage(insights["Best Return"])
         )
 
     with col2:
         st.metric(
             "📉 Worst Performer",
             insights["Worst Performer"],
-            f'{insights["Worst Return"]:.2f}%'
+            format_percentage(insights["Worst Return"])
         )
 
     with col3:
         st.metric(
             "⚖ Largest Holding",
             insights["Largest Holding"],
-            f'{insights["Largest Weight"]:.2f}%'
+            format_percentage(insights["Largest Weight"])
         )
 
 
@@ -94,7 +94,7 @@ def show_top_performers(top_performers):
     for i, row in top_performers.iterrows():
         st.metric(
             f"{i + 1}. {row['Stock']}",
-            f"{row['Return %']:.2f}%"
+            format_percentage(row["Return %"])
         )
 
 
@@ -108,5 +108,5 @@ def show_top_losers(top_losers):
     for i, row in top_losers.iterrows():
         st.metric(
             f"{i + 1}. {row['Stock']}",
-            f"{row['Return %']:.2f}%"
+            format_percentage(row["Return %"])
         )
