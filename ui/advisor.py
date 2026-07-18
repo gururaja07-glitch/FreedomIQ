@@ -1,26 +1,46 @@
+"""
+FreedomIQ
+
+Module : Advisor UI
+
+Purpose :
+Displays Portfolio Advisor recommendations.
+
+Author : Gururaj N K
+Version : 0.1
+"""
+
 import streamlit as st
 
-def show_advisor(advisor):
 
-    st.divider()
+def show_advisor(recommendations):
+    """
+    Display portfolio recommendations.
+    """
 
-    st.subheader("🤖 FreedomIQ Advisor")
+    st.subheader("📋 Portfolio Advisor")
 
-    st.success(
-        f'Portfolio Health : {advisor["Health"]}'
-    )
+    if not recommendations:
 
-    st.markdown("### ✅ Strengths")
+        st.success(
+            "✅ Portfolio is well balanced. No action required."
+        )
+        return
 
-    for item in advisor["Strengths"]:
-        st.write(item)
+    for item in recommendations:
 
-    st.markdown("### ⚠️ Watchlist")
+        priority = item["Priority"]
 
-    for item in advisor["Warnings"]:
-        st.write(item)
+        if priority == "High":
+            icon = "🔴"
 
-    st.markdown("### 📌 Recommended Actions")
+        elif priority == "Medium":
+            icon = "🟡"
 
-    for item in advisor["Actions"]:
-        st.write(item)
+        else:
+            icon = "🟢"
+
+        st.info(
+            f"{icon} **{item['Category']}** : "
+            f"{item['Recommendation']}"
+        )
