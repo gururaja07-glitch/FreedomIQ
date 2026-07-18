@@ -1,140 +1,116 @@
 """
 FreedomIQ
 
-Module : Risk
+Module : Risk Engine
 
 Purpose :
-Identifies portfolio risks.
+Calculates Portfolio Risk.
 
 Author : Gururaj N K
 Version : 0.1
 """
-from tools.portfolio_utils import (
-    calculate_largest_holding,
-    calculate_sector_weights,
-)
+
 from tools.rules import (
-    MAX_SECTOR_WEIGHT,
     MAX_STOCK_WEIGHT,
+    MAX_SECTOR_WEIGHT,
     TARGET_CASH_WEIGHT,
-    TARGET_GOLD_WEIGHT,
 )
 
 
 def calculate_concentration_risk(df):
+    """
+    Risk based on largest stock weight.
+    """
 
-    largest_holding = calculate_largest_holding(df)
+    largest = df["Weight %"].max()
 
-    stock = largest_holding["Stock"]
-
-    weight = largest_holding["Weight %"]
-
-    if weight <= MAX_STOCK_WEIGHT:
-
+    if largest <= MAX_STOCK_WEIGHT:
         return (
             "Low",
-            f"{stock} is within the "
-            f"{MAX_STOCK_WEIGHT}% limit."
+            f"Largest holding is {largest:.1f}%."
         )
 
-    excess = weight - MAX_STOCK_WEIGHT
+    if largest <= MAX_STOCK_WEIGHT + 10:
+        return (
+            "Medium",
+            f"Largest holding is {largest:.1f}%."
+        )
 
     return (
         "High",
-        f"{stock} exceeds the limit "
-        f"by {excess:.2f}%."
+        f"Largest holding is {largest:.1f}%."
     )
 
 
 def calculate_sector_risk(df):
+    """
+    Risk based on largest sector exposure.
+    """
 
-    sector_weights = calculate_sector_weights(df)
+    sector_weight = (
+        df.groupby("Sector")["Weight %"]
+        .sum()
+        .max()
+    )
 
-    sector = sector_weights.idxmax()
-
-    weight = sector_weights.max()
-
-    if weight <= MAX_SECTOR_WEIGHT:
-
+    if sector_weight <= MAX_SECTOR_WEIGHT:
         return (
             "Low",
-            f"{sector} sector is within limit."
+            f"Largest sector exposure is {sector_weight:.1f}%."
         )
 
-    excess = weight - MAX_SECTOR_WEIGHT
+    if sector_weight <= MAX_SECTOR_WEIGHT + 10:
+        return (
+            "Medium",
+            f"Largest sector exposure is {sector_weight:.1f}%."
+        )
 
     return (
         "High",
-        f"{sector} sector exceeds the limit "
-        f"by {excess:.2f}%."
+        f"Largest sector exposure is {sector_weight:.1f}%."
     )
 
 
-def calculate_cash_risk(cash_weight):
+def calculate_cash_risk(allocation):
+    """
+    Risk based on available cash.
+    """
+
+    total = sum(allocation.values())
+
+    if total == 0:
+        return (
+            "High",
+            "Cash allocation unavailable."
+        )
+
+    cash_weight = allocation["Cash"] / total * 100
 
     if cash_weight >= TARGET_CASH_WEIGHT:
-
         return (
             "Low",
-            f"Cash allocation is healthy ({cash_weight:.2f}%)."
+            f"Cash allocation is {cash_weight:.1f}%."
         )
 
-    shortage = TARGET_CASH_WEIGHT - cash_weight
+    if cash_weight >= TARGET_CASH_WEIGHT / 2:
+        return (
+            "Medium",
+            f"Cash allocation is {cash_weight:.1f}%."
+        )
 
     return (
         "High",
-        f"Cash allocation is below target by {shortage:.2f}%."
+        f"Cash allocation is {cash_weight:.1f}%."
     )
 
 
-def calculate_gold_risk(gold_weight):
+def calculate_portfolio_risk(df, allocation):
+    """
+    Calculate portfolio risk summary.
+    """
 
-    if gold_weight >= TARGET_GOLD_WEIGHT:
-
-        return (
-            "Low",
-            f"Gold allocation is healthy ({gold_weight:.2f}%)."
-        )
-
-    shortage = TARGET_GOLD_WEIGHT - gold_weight
-
-    return (
-        "High",
-        f"Gold allocation is below target by {shortage:.2f}%."
-    )
-
-
-def calculate_risk(df, cash_weight, gold_weight):
-
-    concentration = calculate_concentration_risk(df)
-
-    sector = calculate_sector_risk(df)
-
-    cash = calculate_cash_risk(cash_weight)
-
-    gold = calculate_gold_risk(gold_weight)
-
-    risk = {
-        "Concentration": concentration,
-        "Sector": sector,
-        "Cash": cash,
-        "Gold": gold
+    return {
+        "Concentration": calculate_concentration_risk(df),
+        "Sector": calculate_sector_risk(df),
+        "Cash": calculate_cash_risk(allocation),
     }
-
-    return risk
-
-
-def print_risk(risk):
-
-    print()
-    print("=" * 50)
-    print("PORTFOLIO RISK")
-    print("=" * 50)
-
-    for category, (level, message) in risk.items():
-
-        print(f"{category:<15} : {level}")
-        print(f"   {message}")
-        print()
-
-    print("=" * 50)

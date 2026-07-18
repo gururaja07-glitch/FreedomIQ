@@ -17,6 +17,7 @@ from tools.charts import (
     top_holdings_chart,
     asset_allocation_chart,
 )
+from tools.risk import calculate_portfolio_risk
 
 from ui.dashboard import (
     show_metrics,
@@ -36,6 +37,7 @@ st.set_page_config(
 st.title("📈 FreedomIQ")
 st.caption("Personal Portfolio Dashboard")
 
+
 # ----------------------------------
 # Load Portfolio
 # ----------------------------------
@@ -53,16 +55,17 @@ top_performers = get_top_performers(df)
 top_losers = get_top_losers(df)
 
 # ----------------------------------
-# Portfolio Health
+# Portfolio Health & Risk
 # ----------------------------------
 
 health = calculate_portfolio_health(df, allocation)
+risk = calculate_portfolio_risk(df, allocation)
 
 # ----------------------------------
 # Summary Cards
 # ----------------------------------
 
-show_metrics(summary, health, "Low")
+show_metrics(summary, health, "Calculated")
 # ----------------------------------
 # Portfolio Insights
 # ----------------------------------
@@ -126,6 +129,14 @@ st.divider()
 # ----------------------------------
 
 show_health(health)
+
+st.divider()
+
+# ----------------------------------
+# Portfolio Risk
+# ----------------------------------
+
+show_risk(risk)
 
 # ----------------------------------
 # Holdings
