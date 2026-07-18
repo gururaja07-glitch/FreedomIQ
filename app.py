@@ -18,6 +18,8 @@ from tools.charts import (
     asset_allocation_chart,
 )
 from tools.risk import calculate_portfolio_risk
+from tools.advisor import generate_portfolio_advice
+from tools.rebalance import calculate_rebalancing
 
 from ui.dashboard import (
     show_metrics,
@@ -27,7 +29,8 @@ from ui.dashboard import (
 )
 from ui.health import show_health
 from ui.risk import show_risk
-
+from ui.advisor import show_advisor
+from ui.rebalance import show_rebalancing
 st.set_page_config(
     page_title="FreedomIQ",
     page_icon="📈",
@@ -36,6 +39,7 @@ st.set_page_config(
 
 st.title("📈 FreedomIQ")
 st.caption("Personal Portfolio Dashboard")
+
 
 
 # ----------------------------------
@@ -122,7 +126,6 @@ st.pyplot(
 )
 
 st.divider()
-st.divider()
 
 # ----------------------------------
 # Portfolio Health
@@ -138,26 +141,26 @@ st.divider()
 
 show_risk(risk)
 
+st.divider()
 # ----------------------------------
-# Holdings
+# Portfolio Advisor
 # ----------------------------------
 
-st.subheader("Portfolio Holdings")
-
-display_columns = [
-    "Stock",
-    "Quantity",
-    "BuyPrice",
-    "CurrentPrice",
-    "Investment",
-    "Current Value",
-    "Profit",
-    "Return %",
-    "Weight %",
-]
-
-st.dataframe(
-    df[display_columns],
-    use_container_width=True,
-    hide_index=True,
+advisor_recommendations = generate_portfolio_advice(
+    df,
+    allocation
 )
+
+show_advisor(advisor_recommendations)
+
+st.divider()
+
+# ----------------------------------
+# Portfolio Rebalancing
+# ----------------------------------
+
+rebalancing = calculate_rebalancing(df)
+
+show_rebalancing(rebalancing)
+
+st.divider()
