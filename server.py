@@ -1,7 +1,9 @@
 from mcp.server.fastmcp import FastMCP
 
 from services.portfolio_service import get_dashboard_data
+from services.review_service import get_portfolio_review
 from tools.serialization import to_python
+from services.research_service import analyze_company
 
 mcp = FastMCP("FreedomIQ")
 
@@ -39,6 +41,29 @@ def get_portfolio_advice() -> list:
     """Returns portfolio recommendations."""
     dashboard = get_dashboard_data()
     return to_python(dashboard.advisor)
+
+
+@mcp.tool()
+def get_portfolio_risk() -> dict:
+    """Returns portfolio risk analysis."""
+    dashboard = get_dashboard_data()
+    return to_python(dashboard.risk)
+
+
+@mcp.tool()
+def review_portfolio() -> dict:
+    """
+    Returns a complete portfolio review.
+    """
+    return get_portfolio_review()
+
+@mcp.tool()
+def analyze_company_research(company_name: str) -> dict:
+    """
+    Analyze a company and return a structured research report.
+    """
+    analysis = analyze_company(company_name)
+    return to_python(analysis)
 
 
 if __name__ == "__main__":
