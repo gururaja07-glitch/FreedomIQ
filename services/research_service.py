@@ -1,67 +1,48 @@
-import yfinance as yf
-
 from research.models import (
     CompanyAnalysis,
-    CompanySnapshot,
-    FinancialSummary,
-    ValuationSummary,
 )
-from research.ticker_lookup import get_ticker
+
+from research.snapshot import get_company_snapshot
+from research.valuation import get_valuation
+from research.financials import get_financials
+from research.recommendation import generate_recommendation
 
 
 def analyze_company(company_name: str) -> CompanyAnalysis:
     """
-    Returns a structured company analysis using yfinance.
+    Returns a structured company analysis.
     """
 
-    ticker_symbol = get_ticker(company_name)
-    print(f"Input: {company_name}")
-    print(f"Resolved Ticker: {ticker_symbol}")
+    # Get company snapshot and Yahoo Finance data
+    snapshot, info = get_company_snapshot(company_name)
 
-    ticker = yf.Ticker(ticker_symbol)
+    # Extract valuation
+    valuation = get_valuation(info)
 
-    try:
-        info = ticker.info
-        print(f"Fields Returned: {len(info)}")
-    except Exception as e:
-        print(f"Error: {e}")
-        info = {}
+    # Extract financials
+    financials = get_financials(info)
 
-    snapshot = CompanySnapshot(
-        company=info.get("longName", company_name),
-        ticker=info.get("symbol", ticker_symbol),
-        sector=info.get("sector", "Unknown"),
-        industry=info.get("industry", "Unknown"),
-        market_cap=str(info.get("marketCap", "Unknown")),
+    # Generate recommendation
+    (
+        strengths,
+        weaknesses,
+        risks,
+        growth_drivers,
+        recommendation,
+        confidence,
+    ) = generate_recommendation(
+        financials,
+        valuation,
     )
 
-    financials = FinancialSummary(
-        revenue_growth="N/A",
-        profit_growth="N/A",
-        roe=str(info.get("returnOnEquity", "N/A")),
-        roce="N/A",
-        debt_equity=str(info.get("debtToEquity", "N/A")),
-        operating_margin=str(info.get("operatingMargins", "N/A")),
-    )
-
-    valuation = ValuationSummary(
-        pe=str(info.get("trailingPE", "N/A")),
-        pb=str(info.get("priceToBook", "N/A")),
-        ev_ebitda="N/A",
-        peg=str(info.get("pegRatio", "N/A")),
-        valuation="Pending",
-    )
-
-    analysis = CompanyAnalysis(
+    return CompanyAnalysis(
         snapshot=snapshot,
         financials=financials,
         valuation=valuation,
-        strengths=[],
-        weaknesses=[],
-        risks=[],
-        growth_drivers=[],
-        recommendation="Analysis in Progress",
-        confidence="Medium",
+        strengths=strengths,
+        weaknesses=weaknesses,
+        risks=risks,
+        growth_drivers=growth_drivers,
+        recommendation=recommendation,
+        confidence=confidence,
     )
-
-    return analysis
