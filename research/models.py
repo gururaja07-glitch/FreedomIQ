@@ -2,6 +2,10 @@ from dataclasses import dataclass, field
 from typing import List
 
 
+# ==========================================================
+# Company Snapshot
+# ==========================================================
+
 @dataclass
 class CompanySnapshot:
     company: str
@@ -10,6 +14,10 @@ class CompanySnapshot:
     industry: str
     market_cap: str
 
+
+# ==========================================================
+# Financial Summary
+# ==========================================================
 
 @dataclass
 class FinancialSummary:
@@ -21,6 +29,10 @@ class FinancialSummary:
     operating_margin: str
 
 
+# ==========================================================
+# Valuation Summary
+# ==========================================================
+
 @dataclass
 class ValuationSummary:
     pe: str
@@ -30,11 +42,33 @@ class ValuationSummary:
     valuation: str
 
 
+# ==========================================================
+# Investment Score
+# ==========================================================
+
+@dataclass
+class InvestmentScore:
+    valuation: int
+    growth: int
+    profitability: int
+    financial_strength: int
+    business_quality: int
+
+    total: int
+    stars: str
+    rating: str
+
+
+# ==========================================================
+# Complete Company Analysis
+# ==========================================================
+
 @dataclass
 class CompanyAnalysis:
     snapshot: CompanySnapshot
     financials: FinancialSummary
     valuation: ValuationSummary
+    score: InvestmentScore
 
     strengths: List[str] = field(default_factory=list)
     weaknesses: List[str] = field(default_factory=list)
