@@ -22,13 +22,22 @@ def generate_recommendation(
     financials: FinancialSummary,
     valuation: ValuationSummary,
 ):
+    """
+    Generates qualitative insights from the company's
+    financials and valuation.
+
+    Note:
+    The investment recommendation (BUY/HOLD/SELL)
+    is determined by the FreedomIQ Score Engine
+    (score.rating), not by this function.
+    """
 
     strengths = []
     weaknesses = []
     risks = []
     growth_drivers = []
 
-    score = 0
+    confidence_score = 0
 
     # -----------------------
     # PE
@@ -40,11 +49,11 @@ def generate_recommendation(
 
         if pe < 20:
             strengths.append("Attractive valuation")
-            score += 2
+            confidence_score += 2
 
         elif pe < 30:
             strengths.append("Reasonable valuation")
-            score += 1
+            confidence_score += 1
 
         else:
             risks.append("Premium valuation")
@@ -59,7 +68,7 @@ def generate_recommendation(
 
         if peg < 1:
             strengths.append("Growth appears reasonably priced")
-            score += 2
+            confidence_score += 2
 
     # -----------------------
     # Revenue Growth
@@ -71,7 +80,8 @@ def generate_recommendation(
 
         if revenue > 15:
             strengths.append("Strong revenue growth")
-            score += 2
+            growth_drivers.append("Revenue is growing strongly")
+            confidence_score += 2
 
         elif revenue < 0:
             weaknesses.append("Revenue is declining")
@@ -86,11 +96,11 @@ def generate_recommendation(
 
         if profit > 10:
             strengths.append("Healthy earnings growth")
-            score += 2
+            growth_drivers.append("Profit is growing consistently")
+            confidence_score += 2
 
         elif profit < 0:
             weaknesses.append("Profit declined compared to last year")
-            score -= 1
 
     # -----------------------
     # Operating Margin
@@ -102,33 +112,25 @@ def generate_recommendation(
 
         if margin > 10:
             strengths.append("Healthy operating margin")
-            score += 1
+            confidence_score += 1
 
     # -----------------------
-    # Final Recommendation
+    # Confidence
     # -----------------------
 
-    if score >= 6:
-        recommendation = "STRONG BUY"
+    if confidence_score >= 6:
         confidence = "High"
 
-    elif score >= 4:
-        recommendation = "BUY"
-        confidence = "High"
-
-    elif score >= 2:
-        recommendation = "HOLD"
+    elif confidence_score >= 3:
         confidence = "Medium"
 
     else:
-        recommendation = "SELL"
-        confidence = "Medium"
+        confidence = "Low"
 
     return (
         strengths,
         weaknesses,
         risks,
         growth_drivers,
-        recommendation,
         confidence,
     )

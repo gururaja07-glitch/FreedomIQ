@@ -1,5 +1,4 @@
-from dataclasses import dataclass, field
-from typing import List
+from dataclasses import dataclass
 
 
 # ==========================================================
@@ -58,6 +57,8 @@ class InvestmentScore:
     stars: str
     rating: str
 
+    reasons: list[str]
+
 
 # ==========================================================
 # Complete Company Analysis
@@ -68,12 +69,37 @@ class CompanyAnalysis:
     snapshot: CompanySnapshot
     financials: FinancialSummary
     valuation: ValuationSummary
+
     score: InvestmentScore
 
-    strengths: List[str] = field(default_factory=list)
-    weaknesses: List[str] = field(default_factory=list)
-    risks: List[str] = field(default_factory=list)
-    growth_drivers: List[str] = field(default_factory=list)
+    strengths: list[str]
+    weaknesses: list[str]
+    risks: list[str]
+    growth_drivers: list[str]
 
-    recommendation: str = ""
-    confidence: str = ""
+    confidence: str
+
+
+# ==========================================================
+# Research Report
+# ==========================================================
+
+@dataclass
+class ResearchReport:
+    """Structured research report ready for formatting."""
+
+    title: str
+    company: str
+
+    snapshot: CompanySnapshot
+    financials: FinancialSummary
+    valuation: ValuationSummary
+
+    score: InvestmentScore
+
+    strengths: list[str]
+    weaknesses: list[str]
+    risks: list[str]
+    growth_drivers: list[str]
+
+    confidence: str
