@@ -3,6 +3,8 @@ from research.models import (
     ResearchReport,
 )
 
+from research.summary import generate_summary
+
 
 def build_report(analysis: CompanyAnalysis) -> ResearchReport:
     """
@@ -11,12 +13,21 @@ def build_report(analysis: CompanyAnalysis) -> ResearchReport:
     No formatting.
     """
 
+    summary = generate_summary(
+        analysis.snapshot,
+        analysis.financials,
+        analysis.valuation,
+        analysis.score,
+    )
+    print("SUMMARY:", repr(summary))
     return ResearchReport(
         snapshot=analysis.snapshot,
         financials=analysis.financials,
         valuation=analysis.valuation,
 
         score=analysis.score,
+
+        summary=summary,
 
         strengths=analysis.strengths,
         weaknesses=analysis.weaknesses,
