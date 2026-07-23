@@ -2,8 +2,12 @@ from mcp.server.fastmcp import FastMCP
 
 from services.portfolio_service import get_dashboard_data
 from services.review_service import get_portfolio_review
-from tools.serialization import to_python
 from services.research_service import analyze_company
+
+from research.report import build_report
+from research.formatter import format_markdown
+
+from tools.serialization import to_python
 
 mcp = FastMCP("FreedomIQ")
 
@@ -57,13 +61,19 @@ def review_portfolio() -> dict:
     """
     return get_portfolio_review()
 
+
 @mcp.tool()
-def analyze_company_research(company_name: str) -> dict:
+def analyze_company_research(company_name: str) -> str:
     """
-    Analyze a company and return a structured research report.
+    Analyze a company and return a formatted research report.
     """
     analysis = analyze_company(company_name)
-    return to_python(analysis)
+
+    report = build_report(analysis)
+
+    markdown = format_markdown(report)
+
+    return markdown
 
 
 if __name__ == "__main__":

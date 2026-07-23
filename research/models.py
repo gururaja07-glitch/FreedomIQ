@@ -86,10 +86,7 @@ class CompanyAnalysis:
 
 @dataclass
 class ResearchReport:
-    """Structured research report ready for formatting."""
-
-    title: str
-    company: str
+    """Structured research report."""
 
     snapshot: CompanySnapshot
     financials: FinancialSummary
