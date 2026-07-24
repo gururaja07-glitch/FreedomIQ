@@ -1,7 +1,7 @@
 from research.models import ResearchReport
 
 
-REPORT_TITLE = "FreedomIQ Research Report"
+REPORT_TITLE = "THIS IS THE NEW FORMATTER"
 
 
 def format_markdown(report: ResearchReport) -> str:
@@ -127,7 +127,7 @@ def format_markdown(report: ResearchReport) -> str:
 
         lines.append("")
 
-    # ---------------------------------------------------------
+        # ---------------------------------------------------------
     # Growth Drivers
     # ---------------------------------------------------------
 
@@ -137,10 +137,6 @@ def format_markdown(report: ResearchReport) -> str:
         for item in report.growth_drivers:
             lines.append(f"- {item}")
 
-        lines.append("")
-        lines.append("## Executive Summary")
-        lines.append("")
-        lines.append(report.summary)
         lines.append("")
 
     # ---------------------------------------------------------
