@@ -1,17 +1,5 @@
 from research.models import ValuationSummary
-
-
-def _to_float(value):
-    """
-    Safely convert a value to float.
-    Returns None if conversion fails.
-    """
-    try:
-        if value is None:
-            return None
-        return float(value)
-    except (TypeError, ValueError):
-        return None
+from research.utils import safe_float, format_ratio
 
 
 def get_valuation(info: dict) -> ValuationSummary:
@@ -23,10 +11,10 @@ def get_valuation(info: dict) -> ValuationSummary:
     a single metric like PE.
     """
 
-    pe = _to_float(info.get("trailingPE"))
-    pb = _to_float(info.get("priceToBook"))
-    peg = _to_float(info.get("pegRatio"))
-    ev_ebitda = _to_float(info.get("enterpriseToEbitda"))
+    pe = safe_float(info.get("trailingPE"))
+    pb = safe_float(info.get("priceToBook"))
+    peg = safe_float(info.get("pegRatio"))
+    ev_ebitda = safe_float(info.get("enterpriseToEbitda"))
 
     score = 0
     metrics_used = 0
@@ -104,7 +92,6 @@ def get_valuation(info: dict) -> ValuationSummary:
     # -------------------------
     if metrics_used == 0:
         valuation = "Unknown"
-
     else:
         max_score = metrics_used * 5
         percentage = score / max_score
@@ -117,9 +104,9 @@ def get_valuation(info: dict) -> ValuationSummary:
             valuation = "Expensive"
 
     return ValuationSummary(
-        pe=str(pe) if pe is not None else "N/A",
-        pb=str(pb) if pb is not None else "N/A",
-        ev_ebitda=str(ev_ebitda) if ev_ebitda is not None else "N/A",
-        peg=str(peg) if peg is not None else "N/A",
+        pe=format_ratio(pe),
+        pb=format_ratio(pb),
+        ev_ebitda=format_ratio(ev_ebitda),
+        peg=format_ratio(peg),
         valuation=valuation,
     )
