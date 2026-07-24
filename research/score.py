@@ -59,36 +59,41 @@ def _score_valuation(
     valuation: ValuationSummary,
 ) -> tuple[int, list[str]]:
 
-    score = 0
+    """
+    Score valuation based on the consolidated valuation assessment
+    produced by valuation.py.
+
+    This ensures there is a single source of truth for valuation
+    throughout FreedomIQ.
+    """
+
     reasons = []
 
-    pe = _to_float(valuation.pe)
-    pb = _to_float(valuation.pb)
-    peg = _to_float(valuation.peg)
+    match valuation.valuation:
 
-    if pe is not None:
+        case "Undervalued":
+            return (
+                VALUATION_WEIGHT,
+                ["Overall valuation appears attractive"],
+            )
 
-        if pe < PE_EXCELLENT:
-            score += 8
-            reasons.append("Excellent PE valuation")
+        case "Fairly Valued":
+            return (
+                VALUATION_WEIGHT // 2,
+                ["Company appears fairly valued"],
+            )
 
-        elif pe < PE_GOOD:
-            score += 5
-            reasons.append("Reasonable PE valuation")
+        case "Expensive":
+            return (
+                5,
+                ["Current valuation appears expensive"],
+            )
 
-    if pb is not None:
-
-        if pb < PB_EXCELLENT:
-            score += 6
-            reasons.append("Low Price-to-Book ratio")
-
-    if peg is not None:
-
-        if peg < PEG_EXCELLENT:
-            score += 6
-            reasons.append("PEG below 1 indicates attractive growth valuation")
-
-    return min(score, VALUATION_WEIGHT), reasons
+        case _:
+            return (
+                0,
+                ["Insufficient valuation data"],
+            )
 
 
 # ==========================================================

@@ -1,7 +1,7 @@
 from research.models import ResearchReport
 
 
-REPORT_TITLE = "THIS IS THE NEW FORMATTER"
+REPORT_TITLE = "FreedomIQ Research Report"
 
 
 def format_markdown(report: ResearchReport) -> str:
