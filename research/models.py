@@ -93,7 +93,9 @@ class ResearchReport:
     valuation: ValuationSummary
 
     score: InvestmentScore
+
     summary: str
+    investment_thesis: str
 
     strengths: list[str]
     weaknesses: list[str]

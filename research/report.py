@@ -6,6 +6,14 @@ from research.models import (
 from research.explanation_engine import ExplanationEngine
 
 
+from research.models import (
+    CompanyAnalysis,
+    ResearchReport,
+)
+
+from research.explanation_engine import ExplanationEngine
+
+
 def build_report(analysis: CompanyAnalysis) -> ResearchReport:
     """
     Convert CompanyAnalysis into a reusable ResearchReport.
@@ -21,8 +29,6 @@ def build_report(analysis: CompanyAnalysis) -> ResearchReport:
         analysis.score,
     )
 
-    summary = engine.executive_summary()
-
     return ResearchReport(
         snapshot=analysis.snapshot,
         financials=analysis.financials,
@@ -30,7 +36,8 @@ def build_report(analysis: CompanyAnalysis) -> ResearchReport:
 
         score=analysis.score,
 
-        summary=summary,
+        summary=engine.executive_summary(),
+        investment_thesis=engine.investment_thesis(),
 
         strengths=engine.strengths(),
         weaknesses=analysis.weaknesses,

@@ -177,9 +177,109 @@ class ExplanationEngine:
     def confidence(self):
         return "Medium"
 
+           # -----------------------------------------------------
+    # Confidence
     # -----------------------------------------------------
+
+    def confidence(self):
+        return "Medium"
+
+        # -----------------------------------------------------
     # Investment Thesis
     # -----------------------------------------------------
 
     def investment_thesis(self):
-        return ""
+        """
+        Generates an analyst-style investment thesis.
+        """
+
+        company = self.snapshot.company
+
+        revenue = self._number(self.financials.revenue_growth)
+        profit = self._number(self.financials.profit_growth)
+        roe = self._number(self.financials.roe)
+        margin = self._number(self.financials.operating_margin)
+
+        parts = []
+
+        # -------------------------------------------------
+        # Opening
+        # -------------------------------------------------
+
+        parts.append(f"{company} ")
+
+        # -------------------------------------------------
+        # Profitability
+        # -------------------------------------------------
+
+        if roe is not None and roe >= 20:
+            parts.append(
+                "is a financially strong business generating excellent returns on shareholder capital."
+            )
+        elif margin is not None and margin >= 20:
+            parts.append(
+                "maintains excellent operating profitability."
+            )
+        else:
+            parts.append(
+                "shows adequate business profitability."
+            )
+
+        # -------------------------------------------------
+        # Growth
+        # -------------------------------------------------
+
+        if revenue is not None and profit is not None:
+
+            if revenue >= 10 and profit >= 10:
+                parts.append(
+                    "Both revenue and earnings continue to grow at a healthy pace."
+                )
+
+            elif revenue >= 10 and profit < 10:
+                parts.append(
+                    "Revenue continues to grow well, although earnings growth has moderated."
+                )
+
+            elif revenue < 5 and profit < 5:
+                parts.append(
+                    "Growth remains subdued and will require close monitoring."
+                )
+
+        # -------------------------------------------------
+        # Financial Strength
+        # -------------------------------------------------
+
+        if self.score.financial_strength >= 15:
+            parts.append(
+                "The balance sheet remains strong."
+            )
+
+        # -------------------------------------------------
+        # Valuation
+        # -------------------------------------------------
+
+        if self.valuation.valuation == "Undervalued":
+            parts.append(
+                "Current valuation appears attractive."
+            )
+
+        elif self.valuation.valuation == "Fairly Valued":
+            parts.append(
+                "Current valuation appears reasonable."
+            )
+
+        else:
+            parts.append(
+                "Current valuation appears expensive."
+            )
+
+        # -------------------------------------------------
+        # Conclusion
+        # -------------------------------------------------
+
+        parts.append(
+            f"Overall, these characteristics support a {self.score.rating.upper()} recommendation."
+        )
+
+        return " ".join(parts)

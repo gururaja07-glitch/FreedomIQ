@@ -17,10 +17,30 @@ def format_markdown(report: ResearchReport) -> str:
 
     lines.append(f"# {REPORT_TITLE}")
     lines.append("")
+
+    # ---------------------------------------------------------
+    # Executive Summary
+    # ---------------------------------------------------------
+
     lines.append("## Executive Summary")
     lines.append("")
     lines.append(report.summary)
     lines.append("")
+
+    # ---------------------------------------------------------
+    # Investment Thesis
+    # ---------------------------------------------------------
+
+    if report.investment_thesis:
+        lines.append("## Investment Thesis")
+        lines.append("")
+        lines.append(report.investment_thesis)
+        lines.append("")
+
+    # ---------------------------------------------------------
+    # Company Snapshot
+    # ---------------------------------------------------------
+
     lines.append(f"## {report.snapshot.company}")
     lines.append("")
     lines.append(f"**Ticker:** {report.snapshot.ticker}")
@@ -71,7 +91,6 @@ def format_markdown(report: ResearchReport) -> str:
     lines.append("")
 
     lines.append("### Score Breakdown")
-
     lines.append(f"- Valuation: {report.score.valuation}/20")
     lines.append(f"- Growth: {report.score.growth}/20")
     lines.append(f"- Profitability: {report.score.profitability}/20")
@@ -127,7 +146,7 @@ def format_markdown(report: ResearchReport) -> str:
 
         lines.append("")
 
-        # ---------------------------------------------------------
+    # ---------------------------------------------------------
     # Growth Drivers
     # ---------------------------------------------------------
 
