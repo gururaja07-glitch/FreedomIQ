@@ -3,23 +3,26 @@ from research.models import (
     ResearchReport,
 )
 
-from research.summary import generate_summary
+from research.explanation_engine import ExplanationEngine
 
 
 def build_report(analysis: CompanyAnalysis) -> ResearchReport:
     """
     Convert CompanyAnalysis into a reusable ResearchReport.
+
     No calculations.
     No formatting.
     """
 
-    summary = generate_summary(
+    engine = ExplanationEngine(
         analysis.snapshot,
         analysis.financials,
         analysis.valuation,
         analysis.score,
     )
-    print("SUMMARY:", repr(summary))
+
+    summary = engine.executive_summary()
+
     return ResearchReport(
         snapshot=analysis.snapshot,
         financials=analysis.financials,
@@ -29,7 +32,7 @@ def build_report(analysis: CompanyAnalysis) -> ResearchReport:
 
         summary=summary,
 
-        strengths=analysis.strengths,
+        strengths=engine.strengths(),
         weaknesses=analysis.weaknesses,
         risks=analysis.risks,
         growth_drivers=analysis.growth_drivers,
