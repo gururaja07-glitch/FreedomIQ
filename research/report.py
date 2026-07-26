@@ -4,14 +4,7 @@ from research.models import (
 )
 
 from research.explanation_engine import ExplanationEngine
-
-
-from research.models import (
-    CompanyAnalysis,
-    ResearchReport,
-)
-
-from research.explanation_engine import ExplanationEngine
+from research.insight_engine import InsightEngine
 
 
 def build_report(analysis: CompanyAnalysis) -> ResearchReport:
@@ -22,8 +15,14 @@ def build_report(analysis: CompanyAnalysis) -> ResearchReport:
     No formatting.
     """
 
-    engine = ExplanationEngine(
+    explanation = ExplanationEngine(
         analysis.snapshot,
+        analysis.financials,
+        analysis.valuation,
+        analysis.score,
+    )
+
+    insights = InsightEngine(
         analysis.financials,
         analysis.valuation,
         analysis.score,
@@ -33,16 +32,17 @@ def build_report(analysis: CompanyAnalysis) -> ResearchReport:
         snapshot=analysis.snapshot,
         financials=analysis.financials,
         valuation=analysis.valuation,
-
         score=analysis.score,
 
-        summary=engine.executive_summary(),
-        investment_thesis=engine.investment_thesis(),
+        summary=explanation.executive_summary(),
+        investment_thesis=explanation.investment_thesis(),
 
-        strengths=engine.strengths(),
+        strengths=explanation.strengths(),
         weaknesses=analysis.weaknesses,
         risks=analysis.risks,
-        growth_drivers=analysis.growth_drivers,
+
+        # First dynamic insight from the Insight Engine
+        growth_drivers=[insights.growth_insight()],
 
         confidence=analysis.confidence,
     )
