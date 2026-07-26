@@ -158,12 +158,28 @@ def format_markdown(report: ResearchReport) -> str:
 
         lines.append("")
 
-    # ---------------------------------------------------------
+    # -----------------------------------
     # Confidence
-    # ---------------------------------------------------------
+    # -----------------------------------
 
-    lines.append("## Confidence")
+    lines.append("Confidence")
+    lines.append("-" * 40)
+
+    confidence = report.confidence
+
+    if isinstance(confidence, dict):
+        lines.append(confidence["stars"])
+        lines.append(f"Level : {confidence['level']}")
+        lines.append("")
+
+        lines.append("Reasons:")
+
+        for reason in confidence["reasons"]:
+            lines.append(f"• {reason}")
+
+    else:
+        lines.append(str(confidence))
+
     lines.append("")
-    lines.append(report.confidence)
 
     return "\n".join(lines)

@@ -222,7 +222,7 @@ class ExplanationEngine:
         # Opening
         # -------------------------------------------------
 
-        parts.append(f"{company} ")
+        parts.append(company)
 
         # -------------------------------------------------
         # Profitability

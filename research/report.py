@@ -5,6 +5,8 @@ from research.models import (
 
 from research.explanation_engine import ExplanationEngine
 from research.insight_engine import InsightEngine
+from research.weakness_engine import WeaknessEngine
+from research.confidence_engine import ConfidenceEngine
 
 
 def build_report(analysis: CompanyAnalysis) -> ResearchReport:
@@ -28,21 +30,32 @@ def build_report(analysis: CompanyAnalysis) -> ResearchReport:
         analysis.score,
     )
 
+    weaknesses = WeaknessEngine(
+        analysis.financials,
+        analysis.valuation,
+    )
+
+    confidence = ConfidenceEngine(
+    analysis.financials,
+    analysis.valuation,
+    analysis.score,
+ )
+
     return ResearchReport(
         snapshot=analysis.snapshot,
         financials=analysis.financials,
         valuation=analysis.valuation,
+
         score=analysis.score,
 
         summary=explanation.executive_summary(),
         investment_thesis=explanation.investment_thesis(),
 
         strengths=explanation.strengths(),
-        weaknesses=analysis.weaknesses,
+        weaknesses=weaknesses.weaknesses(),
         risks=analysis.risks,
 
-        # First dynamic insight from the Insight Engine
         growth_drivers=[insights.growth_insight()],
 
-        confidence=analysis.confidence,
+        confidence=confidence.confidence(),
     )
