@@ -50,6 +50,28 @@ class ExplanationEngine:
             return None
 
         return safe_float(str(value).replace("%", "").strip())
+     # -----------------------------------------------------
+    # Profitability Commentary
+    # -----------------------------------------------------
+
+    def profitability_commentary(self):
+        """
+        Generates profitability commentary.
+        """
+
+        roe = self._number(self.financials.roe)
+        margin = self._number(self.financials.operating_margin)
+
+        if roe is not None and roe >= 20:
+            return "The company generates excellent returns on shareholder capital."
+
+        if margin is not None and margin >= 20:
+            return "The business maintains excellent operating profitability."
+
+        if margin is not None and margin >= 10:
+            return "Operating profitability remains healthy."
+
+        return "Business profitability appears adequate."
 
     # -----------------------------------------------------
     # Executive Summary
@@ -177,14 +199,8 @@ class ExplanationEngine:
     def confidence(self):
         return "Medium"
 
-           # -----------------------------------------------------
-    # Confidence
+    
     # -----------------------------------------------------
-
-    def confidence(self):
-        return "Medium"
-
-        # -----------------------------------------------------
     # Investment Thesis
     # -----------------------------------------------------
 
@@ -212,18 +228,8 @@ class ExplanationEngine:
         # Profitability
         # -------------------------------------------------
 
-        if roe is not None and roe >= 20:
-            parts.append(
-                "is a financially strong business generating excellent returns on shareholder capital."
-            )
-        elif margin is not None and margin >= 20:
-            parts.append(
-                "maintains excellent operating profitability."
-            )
-        else:
-            parts.append(
-                "shows adequate business profitability."
-            )
+        parts.append("is a financially strong business.")
+        parts.append(self.profitability_commentary())
 
         # -------------------------------------------------
         # Growth
