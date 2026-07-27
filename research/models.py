@@ -6,12 +6,15 @@ from dataclasses import dataclass
 # ==========================================================
 
 @dataclass
-class CompanySnapshot:
+class Snapshot:
     company: str
     ticker: str
     sector: str
     industry: str
     market_cap: str
+
+    current_price: float | None = None
+    shares_outstanding: float | None = None
 
 
 # ==========================================================
@@ -66,7 +69,7 @@ class InvestmentScore:
 
 @dataclass
 class CompanyAnalysis:
-    snapshot: CompanySnapshot
+    snapshot: Snapshot
     financials: FinancialSummary
     valuation: ValuationSummary
 
@@ -86,9 +89,7 @@ class CompanyAnalysis:
 
 @dataclass
 class ResearchReport:
-    """Structured research report."""
-
-    snapshot: CompanySnapshot
+    snapshot: Snapshot
     financials: FinancialSummary
     valuation: ValuationSummary
 
@@ -103,3 +104,15 @@ class ResearchReport:
     growth_drivers: list[str]
 
     confidence: str
+
+
+# ==========================================================
+# DCF Valuation
+# ==========================================================
+
+@dataclass
+class DCFValuation:
+    intrinsic_value: str
+    current_price: str
+    margin_of_safety: str
+    verdict: str

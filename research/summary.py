@@ -1,5 +1,5 @@
 from research.models import (
-    CompanySnapshot,
+    Snapshot,
     FinancialSummary,
     ValuationSummary,
     InvestmentScore,
@@ -7,7 +7,7 @@ from research.models import (
 
 
 def generate_summary(
-    snapshot: CompanySnapshot,
+    snapshot: Snapshot,
     financials: FinancialSummary,
     valuation: ValuationSummary,
     score: InvestmentScore,

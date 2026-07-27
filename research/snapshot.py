@@ -1,6 +1,6 @@
 import yfinance as yf
 
-from research.models import CompanySnapshot
+from research.models import Snapshot
 from research.ticker_lookup import get_ticker
 from research.utils import format_market_cap
 
@@ -16,7 +16,7 @@ def get_company_snapshot(company_name: str):
 
     info = ticker.info
 
-    snapshot = CompanySnapshot(
+    snapshot = Snapshot(
         company=info.get("longName", company_name),
         ticker=info.get("symbol", ticker_symbol),
         sector=info.get("sector", "Unknown"),

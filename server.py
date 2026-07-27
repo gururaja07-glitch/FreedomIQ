@@ -6,6 +6,7 @@ from services.research_service import analyze_company
 
 from research.report import build_report
 from research.formatter import format_markdown
+from research.dcf import DCFEngine
 
 from tools.serialization import to_python
 
@@ -68,6 +69,14 @@ def analyze_company_research(company_name: str) -> str:
     Analyze a company and return a formatted research report.
     """
     analysis = analyze_company(company_name)
+
+    # DCF Test
+    dcf = DCFEngine(
+        analysis.snapshot,
+        analysis.financials,
+    )
+
+    print("Growth Rate:", dcf.choose_growth_rate())
 
     report = build_report(analysis)
 

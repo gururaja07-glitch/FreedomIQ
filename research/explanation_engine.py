@@ -7,7 +7,7 @@ Centralized narrative generation for research reports.
 """
 
 from research.models import (
-    CompanySnapshot,
+    Snapshot,
     FinancialSummary,
     ValuationSummary,
     InvestmentScore,
@@ -23,7 +23,7 @@ class ExplanationEngine:
 
     def __init__(
         self,
-        snapshot: CompanySnapshot,
+        snapshot: Snapshot,
         financials: FinancialSummary,
         valuation: ValuationSummary,
         score: InvestmentScore,
