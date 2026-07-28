@@ -30,6 +30,8 @@ class FinancialSummary:
     debt_equity: str
     operating_margin: str
 
+    free_cash_flow: float | None = None
+
 
 # ==========================================================
 # Valuation Summary

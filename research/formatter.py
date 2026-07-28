@@ -49,7 +49,7 @@ def format_markdown(report: ResearchReport) -> str:
     lines.append(f"**Market Cap:** {report.snapshot.market_cap}")
     lines.append("")
 
-    # ---------------------------------------------------------
+        # ---------------------------------------------------------
     # Financial Summary
     # ---------------------------------------------------------
 
@@ -58,6 +58,7 @@ def format_markdown(report: ResearchReport) -> str:
 
     lines.append(f"- Revenue Growth: {report.financials.revenue_growth}")
     lines.append(f"- Profit Growth: {report.financials.profit_growth}")
+    lines.append(f"- Free Cash Flow: {report.financials.free_cash_flow}")
     lines.append(f"- ROE: {report.financials.roe}")
     lines.append(f"- ROCE: {report.financials.roce}")
     lines.append(f"- Debt / Equity: {report.financials.debt_equity}")

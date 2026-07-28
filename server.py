@@ -10,6 +10,7 @@ from research.dcf import DCFEngine
 
 from tools.serialization import to_python
 
+
 mcp = FastMCP("FreedomIQ")
 
 
@@ -68,19 +69,37 @@ def analyze_company_research(company_name: str) -> str:
     """
     Analyze a company and return a formatted research report.
     """
+
     analysis = analyze_company(company_name)
 
-    # DCF Test
+    report = build_report(analysis)
+
+    markdown = format_markdown(report)
+
+    # -----------------------------------------------------
+    # DCF Forecast Test
+    # -----------------------------------------------------
+
     dcf = DCFEngine(
         analysis.snapshot,
         analysis.financials,
     )
 
-    print("Growth Rate:", dcf.choose_growth_rate())
+    forecasts = dcf.forecast_cashflows()
 
-    report = build_report(analysis)
+    markdown += "\n\n## DCF Forecast\n\n"
 
-    markdown = format_markdown(report)
+    if forecasts:
+
+        for row in forecasts:
+            markdown += (
+                f"Year {row['year']}: "
+                f"{row['fcf']:,.0f}\n"
+            )
+
+    else:
+
+        markdown += "Free Cash Flow not available.\n"
 
     return markdown
 

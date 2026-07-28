@@ -13,6 +13,7 @@ from research.dcf_config import (
     HIGH_GROWTH,
     MEDIUM_GROWTH,
     LOW_GROWTH,
+    YEARS,
 )
 
 
@@ -40,7 +41,7 @@ class DCFEngine:
 
         try:
             return float(str(value).replace("%", "").replace(",", "").strip())
-        except:
+        except Exception:
             return None
 
     # -----------------------------------------------------
@@ -69,12 +70,47 @@ class DCFEngine:
         return LOW_GROWTH
 
     # -----------------------------------------------------
+    # Base Free Cash Flow
+    # -----------------------------------------------------
 
     def get_base_fcf(self):
-        return self.financials.free_cash_flow
+        return self._number(self.financials.free_cash_flow)
+
+    # -----------------------------------------------------
+    # Forecast Cash Flows
+    # -----------------------------------------------------
 
     def forecast_cashflows(self):
-        return None
+        """
+        Forecast Free Cash Flow for the next
+        configured number of years.
+        """
+
+        base_fcf = self.get_base_fcf()
+
+        if base_fcf is None:
+            return []
+
+        growth = self.choose_growth_rate()
+
+        forecasts = []
+
+        current_fcf = base_fcf
+
+        for year in range(1, YEARS + 1):
+
+            current_fcf *= (1 + growth)
+
+            forecasts.append(
+                {
+                    "year": year,
+                    "fcf": current_fcf,
+                }
+            )
+
+        return forecasts
+
+    # -----------------------------------------------------
 
     def calculate_terminal_value(self):
         return None

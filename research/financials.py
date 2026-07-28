@@ -1,5 +1,8 @@
 from research.models import FinancialSummary
-from research.utils import format_percent, format_ratio
+from research.utils import (
+    format_percent,
+    format_ratio,
+)
 
 
 def get_financials(info: dict) -> FinancialSummary:
@@ -14,4 +17,7 @@ def get_financials(info: dict) -> FinancialSummary:
         roce="N/A",  # Yahoo does not provide this reliably
         debt_equity=format_ratio(info.get("debtToEquity")),
         operating_margin=format_percent(info.get("operatingMargins")),
+
+        # Raw value (₹)
+        free_cash_flow=info.get("freeCashflow"),
     )
