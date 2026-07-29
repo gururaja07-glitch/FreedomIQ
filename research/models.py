@@ -32,6 +32,10 @@ class FinancialSummary:
 
     free_cash_flow: float | None = None
 
+    cash: float | None = None
+
+    total_debt: float | None = None
+
 
 # ==========================================================
 # Valuation Summary
@@ -121,10 +125,10 @@ class DCFResult:
     # Discounted yearly cash flows
     discounted_cashflows: list
 
-    # Sum of discounted yearly cash flows
+    # Present value of forecast period
     forecast_pv: float
 
-    # Gordon Growth
+    # Terminal value
     terminal_value: float
 
     discounted_terminal_value: float
@@ -132,17 +136,18 @@ class DCFResult:
     # Enterprise valuation
     enterprise_value: float
 
-    # Final valuation
-    intrinsic_value: float | None = None
+    # Equity valuation
+    intrinsic_value: float
 
-    intrinsic_value_per_share: float | None = None
+    intrinsic_value_per_share: float
 
-    margin_of_safety: float | None = None
+    current_price: float
 
-    verdict: str | None = None
+    margin_of_safety: float
+
+    verdict: str
 
     assumptions: dict | None = None
-
 
 # ==========================================================
 # DCF Valuation (Final Report)

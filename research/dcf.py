@@ -134,46 +134,6 @@ class DCFEngine:
 
     # -----------------------------------------------------
 
-    def calculate_terminal_value(self):
-
-        forecasts = self.forecast_cashflows()
-
-        if not forecasts:
-            return 0.0
-
-        final_fcf = forecasts[-1]["fcf"]
-
-        terminal = (
-            final_fcf *
-            (1 + TERMINAL_GROWTH)
-        ) / (
-            DISCOUNT_RATE - TERMINAL_GROWTH
-        )
-
-        return terminal
-
-    # -----------------------------------------------------
-
-    def discount_terminal_value(self):
-
-        terminal = self.calculate_terminal_value()
-
-        return terminal / (
-            (1 + DISCOUNT_RATE) ** YEARS
-        )
-
-    # -----------------------------------------------------
-
-    def enterprise_value(self):
-
-        _, forecast_pv = self.discount_cashflows()
-
-        terminal_pv = self.discount_terminal_value()
-
-        return forecast_pv + terminal_pv
-
-    # -----------------------------------------------------
-
     def calculate(self):
 
         forecasts = self.forecast_cashflows()
@@ -184,10 +144,7 @@ class DCFEngine:
 
         for row in forecasts:
 
-            pv = (
-                row["fcf"] /
-                ((1 + DISCOUNT_RATE) ** row["year"])
-            )
+            pv = row["fcf"] / ((1 + DISCOUNT_RATE) ** row["year"])
 
             forecast_pv += pv
 
@@ -200,6 +157,7 @@ class DCFEngine:
             )
 
         if forecasts:
+
             final_fcf = forecasts[-1]["fcf"]
 
             terminal_value = (
@@ -213,14 +171,56 @@ class DCFEngine:
                 terminal_value /
                 ((1 + DISCOUNT_RATE) ** YEARS)
             )
+
         else:
+
             terminal_value = 0.0
             discounted_terminal = 0.0
 
-        enterprise_value = (
-            forecast_pv +
-            discounted_terminal
+        enterprise_value = forecast_pv + discounted_terminal
+
+        cash = self.financials.cash or 0.0
+        debt = self.financials.total_debt or 0.0
+
+        intrinsic_value = (
+            enterprise_value
+            + cash
+            - debt
         )
+
+        shares = self.snapshot.shares_outstanding or 0.0
+
+        if shares > 0:
+            intrinsic_per_share = intrinsic_value / shares
+        else:
+            intrinsic_per_share = 0.0
+
+        current_price = self.snapshot.current_price or 0.0
+
+        if intrinsic_per_share > 0:
+
+            margin = (
+                (
+                    intrinsic_per_share
+                    - current_price
+                )
+                / intrinsic_per_share
+            ) * 100
+
+        else:
+
+            margin = 0.0
+
+        if margin >= 30:
+            verdict = "Strong Buy"
+        elif margin >= 15:
+            verdict = "Buy"
+        elif margin >= -10:
+            verdict = "Hold"
+        elif margin >= -25:
+            verdict = "Reduce"
+        else:
+            verdict = "Sell"
 
         return DCFResult(
 
@@ -235,6 +235,16 @@ class DCFEngine:
             discounted_terminal_value=discounted_terminal,
 
             enterprise_value=enterprise_value,
+
+            intrinsic_value=intrinsic_value,
+
+            intrinsic_value_per_share=intrinsic_per_share,
+
+            current_price=current_price,
+
+            margin_of_safety=margin,
+
+            verdict=verdict,
 
             assumptions={
                 "growth_rate": self.choose_growth_rate(),

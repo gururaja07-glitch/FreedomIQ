@@ -1,5 +1,6 @@
 from mcp.server.fastmcp import FastMCP
 
+from research import dcf
 from services.portfolio_service import get_dashboard_data
 from services.review_service import get_portfolio_review
 from services.research_service import analyze_company
