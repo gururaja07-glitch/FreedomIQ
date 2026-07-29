@@ -7,13 +7,16 @@ FreedomIQ DCF Valuation Engine
 from research.models import (
     Snapshot,
     FinancialSummary,
+    DCFResult,
 )
 
 from research.dcf_config import (
+    YEARS,
+    DISCOUNT_RATE,
+    TERMINAL_GROWTH,
     HIGH_GROWTH,
     MEDIUM_GROWTH,
     LOW_GROWTH,
-    YEARS,
 )
 
 
@@ -28,8 +31,6 @@ class DCFEngine:
         self.financials = financials
 
     # -----------------------------------------------------
-    # Helper
-    # -----------------------------------------------------
 
     def _number(self, value):
 
@@ -40,89 +41,167 @@ class DCFEngine:
             return float(value)
 
         try:
-            return float(str(value).replace("%", "").replace(",", "").strip())
+            return float(
+                str(value)
+                .replace("%", "")
+                .replace(",", "")
+                .strip()
+            )
         except Exception:
             return None
 
     # -----------------------------------------------------
-    # Growth Selection
-    # -----------------------------------------------------
 
     def choose_growth_rate(self):
-        """
-        Select growth assumption based on
-        recent revenue growth.
-        """
 
-        revenue_growth = self._number(
+        growth = self._number(
             self.financials.revenue_growth
         )
 
-        if revenue_growth is None:
+        if growth is None:
             return MEDIUM_GROWTH
 
-        if revenue_growth >= 15:
+        if growth >= 15:
             return HIGH_GROWTH
 
-        elif revenue_growth >= 8:
+        if growth >= 8:
             return MEDIUM_GROWTH
 
         return LOW_GROWTH
 
     # -----------------------------------------------------
-    # Base Free Cash Flow
-    # -----------------------------------------------------
 
     def get_base_fcf(self):
-        return self._number(self.financials.free_cash_flow)
 
-    # -----------------------------------------------------
-    # Forecast Cash Flows
+        return self._number(
+            self.financials.free_cash_flow
+        )
+
     # -----------------------------------------------------
 
     def forecast_cashflows(self):
-        """
-        Forecast Free Cash Flow for the next
-        configured number of years.
-        """
 
-        base_fcf = self.get_base_fcf()
+        base = self.get_base_fcf()
 
-        if base_fcf is None:
+        if base is None:
             return []
 
         growth = self.choose_growth_rate()
 
-        forecasts = []
+        cashflows = []
 
-        current_fcf = base_fcf
+        current = base
 
         for year in range(1, YEARS + 1):
 
-            current_fcf *= (1 + growth)
+            current *= (1 + growth)
 
-            forecasts.append(
+            cashflows.append(
                 {
                     "year": year,
-                    "fcf": current_fcf,
+                    "fcf": current,
                 }
             )
 
-        return forecasts
+        return cashflows
+
+    # -----------------------------------------------------
+
+    def discount_cashflows(self):
+
+        discounted = []
+
+        total = 0.0
+
+        for row in self.forecast_cashflows():
+
+            pv = (
+                row["fcf"] /
+                ((1 + DISCOUNT_RATE) ** row["year"])
+            )
+
+            total += pv
+
+            discounted.append(
+                {
+                    "year": row["year"],
+                    "fcf": row["fcf"],
+                    "pv": pv,
+                }
+            )
+
+        return discounted, total
 
     # -----------------------------------------------------
 
     def calculate_terminal_value(self):
-        return None
 
-    def discount_cashflows(self):
-        return None
+        forecasts = self.forecast_cashflows()
 
-    def intrinsic_value_per_share(self):
-        return None
+        if not forecasts:
+            return 0.0
 
-    def margin_of_safety(self):
-        return None
+        final_fcf = forecasts[-1]["fcf"]
 
-    def verdict(self):
-        return None
+        terminal = (
+            final_fcf *
+            (1 + TERMINAL_GROWTH)
+        ) / (
+            DISCOUNT_RATE - TERMINAL_GROWTH
+        )
+
+        return terminal
+
+    # -----------------------------------------------------
+
+    def discount_terminal_value(self):
+
+        terminal = self.calculate_terminal_value()
+
+        return terminal / (
+            (1 + DISCOUNT_RATE) ** YEARS
+        )
+
+    # -----------------------------------------------------
+
+    def enterprise_value(self):
+
+        _, forecast_pv = self.discount_cashflows()
+
+        terminal_pv = self.discount_terminal_value()
+
+        return forecast_pv + terminal_pv
+
+    # -----------------------------------------------------
+
+    def calculate(self):
+
+        discounted, forecast_pv = self.discount_cashflows()
+
+        terminal = self.calculate_terminal_value()
+
+        terminal_pv = self.discount_terminal_value()
+
+        enterprise = forecast_pv + terminal_pv
+
+        return DCFResult(
+
+            forecast_cashflows=self.forecast_cashflows(),
+
+            discounted_cashflows=discounted,
+
+            forecast_pv=forecast_pv,
+
+            terminal_value=terminal,
+
+            discounted_terminal_value=terminal_pv,
+
+            enterprise_value=enterprise,
+
+            assumptions={
+                "growth_rate": self.choose_growth_rate(),
+                "discount_rate": DISCOUNT_RATE,
+                "terminal_growth": TERMINAL_GROWTH,
+                "years": YEARS,
+            },
+        )

@@ -85,21 +85,30 @@ def analyze_company_research(company_name: str) -> str:
         analysis.financials,
     )
 
+    dcf_result = dcf.calculate()
     forecasts = dcf.forecast_cashflows()
 
-    markdown += "\n\n## DCF Forecast\n\n"
+    markdown += "\n\n## DCF Summary\n\n"
 
-    if forecasts:
+    markdown += (
+        f"Forecast PV: "
+        f"{dcf_result.forecast_pv:,.0f}\n\n"
+    )
 
-        for row in forecasts:
-            markdown += (
-                f"Year {row['year']}: "
-                f"{row['fcf']:,.0f}\n"
-            )
+    markdown += (
+        f"Terminal Value: "
+        f"{dcf_result.terminal_value:,.0f}\n\n"
+    )
 
-    else:
+    markdown += (
+        f"Discounted Terminal Value: "
+        f"{dcf_result.discounted_terminal_value:,.0f}\n\n"
+    )
 
-        markdown += "Free Cash Flow not available.\n"
+    markdown += (
+        f"Enterprise Value: "
+        f"{dcf_result.enterprise_value:,.0f}\n"
+    )
 
     return markdown
 

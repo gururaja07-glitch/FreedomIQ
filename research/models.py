@@ -109,7 +109,43 @@ class ResearchReport:
 
 
 # ==========================================================
-# DCF Valuation
+# DCF Result
+# ==========================================================
+
+@dataclass
+class DCFResult:
+
+    # Forecast
+    forecast_cashflows: list
+
+    # Discounted yearly cash flows
+    discounted_cashflows: list
+
+    # Sum of discounted yearly cash flows
+    forecast_pv: float
+
+    # Gordon Growth
+    terminal_value: float
+
+    discounted_terminal_value: float
+
+    # Enterprise valuation
+    enterprise_value: float
+
+    # Final valuation
+    intrinsic_value: float | None = None
+
+    intrinsic_value_per_share: float | None = None
+
+    margin_of_safety: float | None = None
+
+    verdict: str | None = None
+
+    assumptions: dict | None = None
+
+
+# ==========================================================
+# DCF Valuation (Final Report)
 # ==========================================================
 
 @dataclass
