@@ -176,27 +176,65 @@ class DCFEngine:
 
     def calculate(self):
 
-        discounted, forecast_pv = self.discount_cashflows()
+        forecasts = self.forecast_cashflows()
 
-        terminal = self.calculate_terminal_value()
+        discounted = []
 
-        terminal_pv = self.discount_terminal_value()
+        forecast_pv = 0.0
 
-        enterprise = forecast_pv + terminal_pv
+        for row in forecasts:
+
+            pv = (
+                row["fcf"] /
+                ((1 + DISCOUNT_RATE) ** row["year"])
+            )
+
+            forecast_pv += pv
+
+            discounted.append(
+                {
+                    "year": row["year"],
+                    "fcf": row["fcf"],
+                    "pv": pv,
+                }
+            )
+
+        if forecasts:
+            final_fcf = forecasts[-1]["fcf"]
+
+            terminal_value = (
+                final_fcf *
+                (1 + TERMINAL_GROWTH)
+            ) / (
+                DISCOUNT_RATE - TERMINAL_GROWTH
+            )
+
+            discounted_terminal = (
+                terminal_value /
+                ((1 + DISCOUNT_RATE) ** YEARS)
+            )
+        else:
+            terminal_value = 0.0
+            discounted_terminal = 0.0
+
+        enterprise_value = (
+            forecast_pv +
+            discounted_terminal
+        )
 
         return DCFResult(
 
-            forecast_cashflows=self.forecast_cashflows(),
+            forecast_cashflows=forecasts,
 
             discounted_cashflows=discounted,
 
             forecast_pv=forecast_pv,
 
-            terminal_value=terminal,
+            terminal_value=terminal_value,
 
-            discounted_terminal_value=terminal_pv,
+            discounted_terminal_value=discounted_terminal,
 
-            enterprise_value=enterprise,
+            enterprise_value=enterprise_value,
 
             assumptions={
                 "growth_rate": self.choose_growth_rate(),
