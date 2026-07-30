@@ -49,7 +49,7 @@ def format_markdown(report: ResearchReport) -> str:
     lines.append(f"**Market Cap:** {report.snapshot.market_cap}")
     lines.append("")
 
-        # ---------------------------------------------------------
+    # ---------------------------------------------------------
     # Financial Summary
     # ---------------------------------------------------------
 
@@ -80,7 +80,7 @@ def format_markdown(report: ResearchReport) -> str:
     lines.append("")
 
     # ---------------------------------------------------------
-    # Score
+    # FreedomIQ Score
     # ---------------------------------------------------------
 
     lines.append("## FreedomIQ Score")
@@ -159,16 +159,17 @@ def format_markdown(report: ResearchReport) -> str:
 
         lines.append("")
 
-    # -----------------------------------
+    # ---------------------------------------------------------
     # Confidence
-    # -----------------------------------
+    # ---------------------------------------------------------
 
-    lines.append("Confidence")
-    lines.append("-" * 40)
+    lines.append("## Confidence")
+    lines.append("")
 
     confidence = report.confidence
 
     if isinstance(confidence, dict):
+
         lines.append(confidence["stars"])
         lines.append(f"Level : {confidence['level']}")
         lines.append("")
@@ -182,5 +183,52 @@ def format_markdown(report: ResearchReport) -> str:
         lines.append(str(confidence))
 
     lines.append("")
+
+    # ---------------------------------------------------------
+    # DCF Valuation
+    # ---------------------------------------------------------
+
+    if report.dcf:
+
+        lines.append("## DCF Valuation")
+        lines.append("")
+
+        lines.append(
+            f"Forecast Cash Flow PV: {report.dcf.forecast_pv:,.0f}"
+        )
+
+        lines.append(
+            f"Terminal Value: {report.dcf.terminal_value:,.0f}"
+        )
+
+        lines.append(
+            f"Discounted Terminal Value: {report.dcf.discounted_terminal_value:,.0f}"
+        )
+
+        lines.append(
+            f"Enterprise Value: {report.dcf.enterprise_value:,.0f}"
+        )
+
+        lines.append(
+            f"Intrinsic Value: {report.dcf.intrinsic_value:,.0f}"
+        )
+
+        lines.append(
+            f"Intrinsic Value / Share: {report.dcf.intrinsic_value_per_share:,.2f}"
+        )
+
+        lines.append(
+            f"Current Price: {report.dcf.current_price:,.2f}"
+        )
+
+        lines.append(
+            f"Margin of Safety: {report.dcf.margin_of_safety:.2f}%"
+        )
+
+        lines.append(
+            f"DCF Verdict: {report.dcf.verdict}"
+        )
+
+        lines.append("")
 
     return "\n".join(lines)

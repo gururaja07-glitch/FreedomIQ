@@ -73,6 +73,7 @@ class InvestmentScore:
 # Complete Company Analysis
 # ==========================================================
 
+
 @dataclass
 class CompanyAnalysis:
     snapshot: Snapshot
@@ -88,6 +89,7 @@ class CompanyAnalysis:
 
     confidence: str
 
+    dcf: DCFResult | None = None
 
 # ==========================================================
 # Research Report
@@ -110,6 +112,8 @@ class ResearchReport:
     growth_drivers: list[str]
 
     confidence: str
+
+    dcf: DCFResult | None = None
 
 
 # ==========================================================
@@ -153,9 +157,3 @@ class DCFResult:
 # DCF Valuation (Final Report)
 # ==========================================================
 
-@dataclass
-class DCFValuation:
-    intrinsic_value: str
-    current_price: str
-    margin_of_safety: str
-    verdict: str

@@ -7,6 +7,7 @@ from research.valuation import get_valuation
 from research.financials import get_financials
 from research.score import calculate_score
 from research.recommendation import generate_recommendation
+from research.dcf import DCFEngine
 
 
 def analyze_company(company_name: str) -> CompanyAnalysis:
@@ -34,18 +35,27 @@ def analyze_company(company_name: str) -> CompanyAnalysis:
     )
 
     # -------------------------------------------------
+    # DCF Valuation
+    # -------------------------------------------------
+
+    dcf = DCFEngine(
+        snapshot,
+        financials,
+    ).calculate()
+
+    # -------------------------------------------------
     # AI Explanation
     # -------------------------------------------------
 
     (
-    strengths,
-    weaknesses,
-    risks,
-    growth_drivers,
-    confidence,
+        strengths,
+        weaknesses,
+        risks,
+        growth_drivers,
+        confidence,
     ) = generate_recommendation(
-    financials,
-    valuation,
+        financials,
+        valuation,
     )
 
     # -------------------------------------------------
@@ -62,4 +72,5 @@ def analyze_company(company_name: str) -> CompanyAnalysis:
         risks=risks,
         growth_drivers=growth_drivers,
         confidence=confidence,
+        dcf=dcf,
     )

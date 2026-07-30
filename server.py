@@ -65,6 +65,7 @@ def review_portfolio() -> dict:
     return get_portfolio_review()
 
 
+
 @mcp.tool()
 def analyze_company_research(company_name: str) -> str:
     """
@@ -76,6 +77,8 @@ def analyze_company_research(company_name: str) -> str:
     report = build_report(analysis)
 
     markdown = format_markdown(report)
+
+    return markdown
 
     # -----------------------------------------------------
     # DCF Forecast Test

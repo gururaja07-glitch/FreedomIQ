@@ -36,10 +36,10 @@ def build_report(analysis: CompanyAnalysis) -> ResearchReport:
     )
 
     confidence = ConfidenceEngine(
-    analysis.financials,
-    analysis.valuation,
-    analysis.score,
- )
+        analysis.financials,
+        analysis.valuation,
+        analysis.score,
+    )
 
     return ResearchReport(
         snapshot=analysis.snapshot,
@@ -58,4 +58,6 @@ def build_report(analysis: CompanyAnalysis) -> ResearchReport:
         growth_drivers=[insights.growth_insight()],
 
         confidence=confidence.confidence(),
+
+        dcf=getattr(analysis, "dcf", None),
     )

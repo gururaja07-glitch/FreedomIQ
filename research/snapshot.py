@@ -22,6 +22,11 @@ def get_company_snapshot(company_name: str):
         sector=info.get("sector", "Unknown"),
         industry=info.get("industry", "Unknown"),
         market_cap=format_market_cap(info.get("marketCap")),
+
+        current_price=info.get("currentPrice")
+        or info.get("regularMarketPrice"),
+
+        shares_outstanding=info.get("sharesOutstanding"),
     )
 
     return snapshot, info
