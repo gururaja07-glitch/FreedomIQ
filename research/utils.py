@@ -125,3 +125,20 @@ def format_currency(value):
         return "N/A"
 
     return f"₹{value:,.2f}"
+
+def format_indian_currency(value):
+    if value is None:
+        return "N/A"
+
+    value = float(value)
+
+    if abs(value) >= 1e12:
+        return f"₹{value/1e12:.2f} Lakh Cr"
+
+    if abs(value) >= 1e7:
+        return f"₹{value/1e7:.2f} Cr"
+
+    if abs(value) >= 1e5:
+        return f"₹{value/1e5:.2f} Lakh"
+
+    return f"₹{value:,.2f}"

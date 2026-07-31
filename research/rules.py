@@ -92,8 +92,8 @@ REDUCE_SCORE = 40
 # STAR RATINGS
 # =========================================================
 
-FIVE_STAR = "★★★★★"
-FOUR_STAR = "★★★★☆"
-THREE_STAR = "★★★☆☆"
-TWO_STAR = "★★☆☆☆"
-ONE_STAR = "★☆☆☆☆"
+FIVE_STAR = "*****"
+FOUR_STAR = "****"
+THREE_STAR = "***"
+TWO_STAR = "**"
+ONE_STAR = "*"

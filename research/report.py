@@ -41,6 +41,11 @@ def build_report(analysis: CompanyAnalysis) -> ResearchReport:
         analysis.score,
     )
 
+    print("Summary:", repr(explanation.executive_summary()))
+    print("Investment Thesis:", repr(explanation.investment_thesis()))
+    print("Growth Insight:", repr(insights.growth_insight()))
+    print("Confidence:", repr(confidence.confidence()))
+
     return ResearchReport(
         snapshot=analysis.snapshot,
         financials=analysis.financials,

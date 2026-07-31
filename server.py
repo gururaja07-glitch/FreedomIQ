@@ -119,3 +119,12 @@ def analyze_company_research(company_name: str) -> str:
 
 if __name__ == "__main__":
     mcp.run()
+
+from portfolio.loader import get_portfolio
+from portfolio.analyzer import analyze_portfolio
+
+portfolio = get_portfolio()
+
+summary = analyze_portfolio(portfolio)
+
+print(summary)

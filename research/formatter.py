@@ -1,5 +1,8 @@
 from research.models import ResearchReport
-
+from research.utils import (
+    format_currency,
+    format_indian_currency,
+)
 
 REPORT_TITLE = "FreedomIQ Research Report"
 
@@ -58,7 +61,9 @@ def format_markdown(report: ResearchReport) -> str:
 
     lines.append(f"- Revenue Growth: {report.financials.revenue_growth}")
     lines.append(f"- Profit Growth: {report.financials.profit_growth}")
-    lines.append(f"- Free Cash Flow: {report.financials.free_cash_flow}")
+    lines.append(
+        f"- Free Cash Flow: {format_indian_currency(report.financials.free_cash_flow)}"
+    )
     lines.append(f"- ROE: {report.financials.roe}")
     lines.append(f"- ROCE: {report.financials.roce}")
     lines.append(f"- Debt / Equity: {report.financials.debt_equity}")
@@ -169,18 +174,31 @@ def format_markdown(report: ResearchReport) -> str:
     confidence = report.confidence
 
     if isinstance(confidence, dict):
+        stars = confidence["stars"]
+        level = confidence["level"]
+        reasons = confidence["reasons"]
 
-        lines.append(confidence["stars"])
-        lines.append(f"Level : {confidence['level']}")
+    elif hasattr(confidence, "stars"):
+        stars = confidence.stars
+        level = confidence.level
+        reasons = confidence.reasons
+
+    else:
+        lines.append(str(confidence))
+        lines.append("")
+        stars = None
+        level = None
+        reasons = None
+
+    if stars is not None:
+        lines.append(stars)
+        lines.append(f"Level : {level}")
         lines.append("")
 
         lines.append("Reasons:")
 
-        for reason in confidence["reasons"]:
-            lines.append(f"• {reason}")
-
-    else:
-        lines.append(str(confidence))
+        for reason in reasons:
+            lines.append(f"- {reason}")
 
     lines.append("")
 
@@ -220,15 +238,5 @@ def format_markdown(report: ResearchReport) -> str:
         lines.append(
             f"Current Price: {report.dcf.current_price:,.2f}"
         )
-
-        lines.append(
-            f"Margin of Safety: {report.dcf.margin_of_safety:.2f}%"
-        )
-
-        lines.append(
-            f"DCF Verdict: {report.dcf.verdict}"
-        )
-
-        lines.append("")
 
     return "\n".join(lines)

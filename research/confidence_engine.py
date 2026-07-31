@@ -10,6 +10,7 @@ from research.models import (
     FinancialSummary,
     ValuationSummary,
     InvestmentScore,
+    ConfidenceSummary,
 )
 
 
@@ -25,7 +26,7 @@ class ConfidenceEngine:
         self.valuation = valuation
         self.score = score
 
-    def confidence(self):
+    def confidence(self) -> ConfidenceSummary:
         """
         Returns confidence rating and reasons.
         """
@@ -54,23 +55,23 @@ class ConfidenceEngine:
             reasons.append("Valuation analysis available.")
 
         if score == 4:
-            stars = "★★★★★"
+            stars = "*****"
             level = "High"
 
         elif score == 3:
-            stars = "★★★★☆"
+            stars = "****"
             level = "Good"
 
         elif score == 2:
-            stars = "★★★☆☆"
+            stars = "***"
             level = "Medium"
 
         else:
-            stars = "★★☆☆☆"
+            stars = "**"
             level = "Low"
 
-        return {
-            "stars": stars,
-            "level": level,
-            "reasons": reasons,
-        }
+        return ConfidenceSummary(
+            stars=stars,
+            level=level,
+            reasons=reasons,
+        )

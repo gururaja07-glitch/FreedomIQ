@@ -69,6 +69,13 @@ class InvestmentScore:
     reasons: list[str]
 
 
+@dataclass
+class ConfidenceSummary:
+    stars: str
+    level: str
+    reasons: list[str]
+
+
 # ==========================================================
 # Complete Company Analysis
 # ==========================================================
@@ -111,7 +118,7 @@ class ResearchReport:
     risks: list[str]
     growth_drivers: list[str]
 
-    confidence: str
+    confidence: ConfidenceSummary
 
     dcf: DCFResult | None = None
 
