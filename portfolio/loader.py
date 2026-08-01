@@ -1,6 +1,8 @@
 from pathlib import Path
 import pandas as pd
 
+from research.snapshot import get_company_snapshot
+
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 HOLDINGS_FILE = PROJECT_ROOT / "data" / "holdings.xls"
 
@@ -25,6 +27,23 @@ def get_portfolio():
         raise ValueError(f"Missing required columns: {missing}")
 
     df = df.rename(columns=REQUIRED_COLUMNS)
+
+    sectors = []
+    industries = []
+    tickers = []
+    market_caps = []
+
+    for stock in df["Stock"]:
+        snapshot, _ = get_company_snapshot(stock)
+        tickers.append(snapshot.ticker)
+        sectors.append(snapshot.sector)
+        industries.append(snapshot.industry)
+        market_caps.append(snapshot.market_cap)
+
+    df["Ticker"] = tickers
+    df["Sector"] = sectors
+    df["Industry"] = industries
+    df["MarketCap"] = market_caps
 
     df["InvestedValue"] = df["Quantity"] * df["BuyPrice"]
     df["CurrentValue"] = df["Quantity"] * df["CurrentPrice"]

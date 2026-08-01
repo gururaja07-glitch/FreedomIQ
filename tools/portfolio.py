@@ -1,5 +1,6 @@
 from pathlib import Path
 import pandas as pd
+from research.snapshot import get_company_snapshot
 
 # Project root directory
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -65,6 +66,24 @@ def get_portfolio() -> pd.DataFrame:
     for col in numeric_columns:
         df[col] = pd.to_numeric(df[col], errors="coerce")
 
+    # Enrich portfolio with company information
+    tickers = []
+    sectors = []
+    industries = []
+    market_caps = []
+
+    for stock in df["Stock"]:
+        snapshot, _ = get_company_snapshot(stock)
+        tickers.append(snapshot.ticker)
+        sectors.append(snapshot.sector)
+        industries.append(snapshot.industry)
+        market_caps.append(snapshot.market_cap)
+
+    df["Ticker"] = tickers
+    df["Sector"] = sectors
+    df["Industry"] = industries
+    df["MarketCap"] = market_caps
+
     # Remove invalid rows
     df = df.dropna(
         subset=[
@@ -96,5 +115,7 @@ def get_portfolio() -> pd.DataFrame:
         by="CurrentValue",
         ascending=False,
     ).reset_index(drop=True)
+
+    print(df.columns.tolist())
 
     return df

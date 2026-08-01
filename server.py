@@ -14,12 +14,19 @@ from tools.serialization import to_python
 
 mcp = FastMCP("FreedomIQ")
 
-
 @mcp.tool()
 def get_portfolio_summary() -> dict:
-    """Returns the current portfolio summary."""
-    dashboard = get_dashboard_data()
-    return to_python(dashboard.summary)
+    try:
+        dashboard = get_dashboard_data()
+        return to_python(dashboard.summary)
+
+    except Exception as e:
+        import traceback
+
+        return {
+            "error": str(e),
+            "traceback": traceback.format_exc(),
+        }
 
 
 @mcp.tool()
@@ -128,3 +135,21 @@ portfolio = get_portfolio()
 summary = analyze_portfolio(portfolio)
 
 print(summary)
+
+
+@mcp.tool()
+def get_portfolio_metrics():
+    try:
+        portfolio = get_portfolio()
+
+        metrics = calculate_metrics(portfolio)
+
+        return to_python(metrics)
+
+    except Exception as e:
+        import traceback
+
+        return {
+            "error": str(e),
+            "traceback": traceback.format_exc(),
+        }

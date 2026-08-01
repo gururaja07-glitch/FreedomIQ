@@ -12,6 +12,26 @@ def get_company_snapshot(company_name: str):
 
     ticker_symbol = get_ticker(company_name)
 
+    if ticker_symbol is None:
+        snapshot = Snapshot(
+            company="Cash",
+            ticker="CASH",
+            sector="Cash",
+            industry="Cash",
+            market_cap="N/A",
+        )
+        return snapshot, {}
+
+    if company_name.upper().startswith("SGB"):
+        snapshot = Snapshot(
+            company=company_name,
+            ticker=company_name,
+            sector="Gold",
+            industry="Sovereign Gold Bond",
+            market_cap="N/A",
+        )
+        return snapshot, {}
+
     ticker = yf.Ticker(ticker_symbol)
 
     info = ticker.info

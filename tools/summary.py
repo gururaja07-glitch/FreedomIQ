@@ -4,6 +4,8 @@ from tools.portfolio_utils import (
     calculate_cash_weight,
     calculate_gold_weight
 )
+from portfolio.loader import get_portfolio
+from portfolio.metrics import calculate_metrics
 
 def calculate_portfolio_summary(df, cash, gold):
 

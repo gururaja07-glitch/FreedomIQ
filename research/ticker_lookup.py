@@ -1,4 +1,18 @@
+"""
+FreedomIQ
+
+Ticker Lookup
+
+Converts company names and portfolio symbols into
+Yahoo Finance NSE tickers.
+"""
+
 TICKERS = {
+
+    # --------------------------------------------------
+    # Company Names
+    # --------------------------------------------------
+
     "reliance": "RELIANCE.NS",
     "reliance industries": "RELIANCE.NS",
 
@@ -27,19 +41,81 @@ TICKERS = {
 
     "godrej consumer": "GODREJCP.NS",
 
+    "godrej consumer products": "GODREJCP.NS",
+
     "unominda": "UNOMINDA.NS",
 
     "nalco": "NATIONALUM.NS",
 
     "vbl": "VBL.NS",
+
+    "varun beverages": "VBL.NS",
+
+    "shriram finance": "SHRIRAMFIN.NS",
+
+    "cera": "CERA.NS",
+
+    "adani enterprises": "ADANIENT.NS",
+
+    "adani ports": "ADANIPORTS.NS",
+
+    # --------------------------------------------------
+    # Portfolio Symbols
+    # --------------------------------------------------
+
+    "reliance": "RELIANCE.NS",
+    "infy": "INFY.NS",
+    "tcs": "TCS.NS",
+    "lt": "LT.NS",
+    "ltf": "LTF.NS",
+    "icicibank": "ICICIBANK.NS",
+    "itc": "ITC.NS",
+    "jiofin": "JIOFIN.NS",
+    "ashokley": "ASHOKLEY.NS",
+    "sunpharma": "SUNPHARMA.NS",
+    "godrejcp": "GODREJCP.NS",
+    "unominda": "UNOMINDA.NS",
+    "nationalum": "NATIONALUM.NS",
+    "nalco": "NATIONALUM.NS",
+    "vbl": "VBL.NS",
+    "shriramfin": "SHRIRAMFIN.NS",
+    "cera": "CERA.NS",
+    "adanient": "ADANIENT.NS",
+    "adaniports": "ADANIPORTS.NS",
+
+    # ETFs
+
+    "mid150bees": "MID150BEES.NS",
+    "niftyietf": "NIFTYIETF.NS",
+
+    # Commodities
+
+    "silvercase": "SILVERCASE.NS",
+
+    # Sovereign Gold Bond
+
+    "sgbde31iii-gb": "SGBDE31III-GB.NS",
 }
 
 
 def get_ticker(company_name: str) -> str:
     """
-    Convert a company name into an NSE ticker.
+    Convert a company name or portfolio symbol
+    into a Yahoo Finance ticker.
     """
 
     key = company_name.strip().lower()
 
-    return TICKERS.get(key, company_name.upper())
+    # Cash is not a market-traded security.
+    if key == "cash":
+        return None
+
+    if key in TICKERS:
+        return TICKERS[key]
+
+    # Already a Yahoo ticker
+    if company_name.upper().endswith(".NS"):
+        return company_name.upper()
+
+    # Default to NSE
+    return company_name.upper() + ".NS"
