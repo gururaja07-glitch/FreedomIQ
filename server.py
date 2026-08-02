@@ -10,6 +10,7 @@ from research.formatter import format_markdown
 from research.dcf import DCFEngine
 
 from tools.serialization import to_python
+from portfolio.dashboard import get_portfolio_dashboard
 
 
 mcp = FastMCP("FreedomIQ")
@@ -129,12 +130,8 @@ if __name__ == "__main__":
 
 from portfolio.loader import get_portfolio
 from portfolio.analyzer import analyze_portfolio
+from portfolio.dashboard import get_portfolio_dashboard
 
-portfolio = get_portfolio()
-
-summary = analyze_portfolio(portfolio)
-
-print(summary)
 
 
 @mcp.tool()
@@ -153,3 +150,42 @@ def get_portfolio_metrics():
             "error": str(e),
             "traceback": traceback.format_exc(),
         }
+@mcp.tool()
+def get_portfolio_score():
+    """
+    Returns the FreedomIQ Portfolio Score.
+    """
+
+    dashboard = get_portfolio_dashboard()
+
+    return to_python(dashboard.score)
+
+@mcp.tool()
+def get_portfolio_ai_advice() -> list:
+    """
+    Returns AI-generated portfolio recommendations.
+    """
+
+    dashboard = get_portfolio_dashboard()
+
+    return dashboard.advice
+
+@mcp.tool()
+def get_portfolio_dashboard_data() -> dict:
+    """
+    Returns the complete FreedomIQ portfolio dashboard.
+    """
+
+    dashboard = get_portfolio_dashboard()
+
+    return to_python(dashboard)
+
+@mcp.tool()
+def get_portfolio_decisions() -> list:
+    """
+    Returns structured portfolio decisions.
+    """
+
+    dashboard = get_portfolio_dashboard()
+
+    return to_python(dashboard.decisions)
