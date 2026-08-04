@@ -1,26 +1,31 @@
-from dataclasses import dataclass
+"""
+FreedomIQ
+
+Module : Decision Engine
+
+Purpose :
+Generates portfolio investment decisions.
+
+Author : Gururaj N K
+Version : 1.0
+"""
+
 from typing import TYPE_CHECKING
+
+from portfolio.models import InvestmentDecision
 
 if TYPE_CHECKING:
     from portfolio.dashboard import PortfolioDashboard
 
 
-@dataclass
-class Decision:
-    issue: str
-    reason: str
-    action: str
-    priority: str
-
-
 def generate_decisions(
     dashboard: "PortfolioDashboard",
-) -> list[Decision]:
+) -> list[InvestmentDecision]:
     """
-    Generate portfolio decisions.
+    Generate portfolio investment decisions.
     """
 
-    decisions = []
+    decisions: list[InvestmentDecision] = []
 
     summary = dashboard.summary
     metrics = dashboard.metrics
@@ -33,7 +38,7 @@ def generate_decisions(
 
         decisions.append(
 
-            Decision(
+            InvestmentDecision(
 
                 issue="Portfolio concentration is high.",
 
@@ -62,7 +67,7 @@ def generate_decisions(
 
         decisions.append(
 
-            Decision(
+            InvestmentDecision(
 
                 issue="Portfolio diversification is limited.",
 
@@ -88,7 +93,7 @@ def generate_decisions(
 
         decisions.append(
 
-            Decision(
+            InvestmentDecision(
 
                 issue="Portfolio performance is strong.",
 
