@@ -1,20 +1,8 @@
-from dataclasses import dataclass
+from portfolio.models import PortfolioScore
 
 from portfolio.analyzer import PortfolioSummary
 from portfolio.metrics import PortfolioMetrics
 
-
-@dataclass
-class PortfolioScore:
-
-    diversification: int
-    concentration: int
-    profitability: int
-
-    overall: int
-
-    rating: str
-    stars: str
 
 
 def calculate_portfolio_score(

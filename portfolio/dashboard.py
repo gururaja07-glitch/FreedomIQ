@@ -1,5 +1,4 @@
-from dataclasses import dataclass
-
+from portfolio.models import PortfolioDashboard
 from portfolio.loader import get_portfolio
 from portfolio.analyzer import analyze_portfolio
 from portfolio.metrics import calculate_metrics
@@ -8,13 +7,7 @@ from portfolio.advisor import generate_advice
 from portfolio.decision_engine import generate_decisions
 
 
-@dataclass
-class PortfolioDashboard:
-    summary: object
-    metrics: object
-    score: object
-    advice: list[str]
-    decisions: list
+
 
 
 def get_portfolio_dashboard() -> PortfolioDashboard:

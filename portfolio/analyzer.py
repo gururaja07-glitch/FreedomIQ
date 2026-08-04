@@ -1,18 +1,8 @@
-from dataclasses import dataclass
+from portfolio.models import PortfolioSummary
 import pandas as pd
 
 
-@dataclass
-class PortfolioSummary:
-    total_invested: float
-    total_value: float
-    total_profit: float
-    total_return: float
 
-    largest_holding: str
-    largest_holding_weight: float
-
-    number_of_holdings: int
 
 
 def analyze_portfolio(df: pd.DataFrame) -> PortfolioSummary:

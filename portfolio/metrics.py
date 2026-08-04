@@ -1,16 +1,7 @@
-from dataclasses import dataclass
+from portfolio.models import PortfolioMetrics
+
 import pandas as pd
 
-
-@dataclass
-class PortfolioMetrics:
-    top5_weight: float
-    top10_weight: float
-
-    largest_holding: str
-    largest_weight: float
-
-    diversification_score: int
 
 
 def calculate_metrics(df: pd.DataFrame) -> PortfolioMetrics:
