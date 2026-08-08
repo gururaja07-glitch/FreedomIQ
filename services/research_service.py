@@ -19,11 +19,16 @@ def analyze_company(company_name: str) -> CompanyAnalysis:
     # Fetch data
     # -------------------------------------------------
 
-    snapshot, info = get_company_snapshot(company_name)
+    snapshot, info = get_company_snapshot(
+        company_name
+    )
 
     valuation = get_valuation(info)
 
-    financials = get_financials(info)
+    financials = get_financials(
+        info,
+        snapshot.ticker,
+    )
 
     # -------------------------------------------------
     # FreedomIQ Score
