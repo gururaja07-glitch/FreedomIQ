@@ -1,8 +1,10 @@
 from research.models import ResearchReport
+
 from research.utils import (
     format_currency,
     format_indian_currency,
 )
+
 
 REPORT_TITLE = "FreedomIQ Research Report"
 
@@ -59,15 +61,25 @@ def format_markdown(report: ResearchReport) -> str:
     lines.append("## Financial Summary")
     lines.append("")
 
-    lines.append(f"- Revenue Growth: {report.financials.revenue_growth}")
-    lines.append(f"- Profit Growth: {report.financials.profit_growth}")
     lines.append(
-        f"- Free Cash Flow: {format_indian_currency(report.financials.free_cash_flow)}"
+        f"- Revenue Growth: {report.financials.revenue_growth}"
+    )
+    lines.append(
+        f"- Profit Growth: {report.financials.profit_growth}"
+    )
+    lines.append(
+        f"- Free Cash Flow: "
+        f"{format_indian_currency(report.financials.free_cash_flow)}"
     )
     lines.append(f"- ROE: {report.financials.roe}")
     lines.append(f"- ROCE: {report.financials.roce}")
-    lines.append(f"- Debt / Equity: {report.financials.debt_equity}")
-    lines.append(f"- Operating Margin: {report.financials.operating_margin}")
+    lines.append(
+        f"- Debt / Equity: {report.financials.debt_equity}"
+    )
+    lines.append(
+        f"- Operating Margin: "
+        f"{report.financials.operating_margin}"
+    )
     lines.append("")
 
     # ---------------------------------------------------------
@@ -97,11 +109,23 @@ def format_markdown(report: ResearchReport) -> str:
     lines.append("")
 
     lines.append("### Score Breakdown")
-    lines.append(f"- Valuation: {report.score.valuation}/20")
-    lines.append(f"- Growth: {report.score.growth}/20")
-    lines.append(f"- Profitability: {report.score.profitability}/20")
-    lines.append(f"- Financial Strength: {report.score.financial_strength}/20")
-    lines.append(f"- Business Quality: {report.score.business_quality}/20")
+    lines.append(
+        f"- Valuation: {report.score.valuation}/20"
+    )
+    lines.append(
+        f"- Growth: {report.score.growth}/20"
+    )
+    lines.append(
+        f"- Profitability: {report.score.profitability}/20"
+    )
+    lines.append(
+        f"- Financial Strength: "
+        f"{report.score.financial_strength}/20"
+    )
+    lines.append(
+        f"- Business Quality: "
+        f"{report.score.business_quality}/20"
+    )
     lines.append("")
 
     # ---------------------------------------------------------
@@ -109,7 +133,9 @@ def format_markdown(report: ResearchReport) -> str:
     # ---------------------------------------------------------
 
     if report.score.reasons:
+
         lines.append("### Why this score?")
+        lines.append("")
 
         for reason in report.score.reasons:
             lines.append(f"- {reason}")
@@ -121,7 +147,9 @@ def format_markdown(report: ResearchReport) -> str:
     # ---------------------------------------------------------
 
     if report.strengths:
+
         lines.append("## Strengths")
+        lines.append("")
 
         for item in report.strengths:
             lines.append(f"- {item}")
@@ -133,7 +161,9 @@ def format_markdown(report: ResearchReport) -> str:
     # ---------------------------------------------------------
 
     if report.weaknesses:
+
         lines.append("## Weaknesses")
+        lines.append("")
 
         for item in report.weaknesses:
             lines.append(f"- {item}")
@@ -145,7 +175,9 @@ def format_markdown(report: ResearchReport) -> str:
     # ---------------------------------------------------------
 
     if report.risks:
+
         lines.append("## Risks")
+        lines.append("")
 
         for item in report.risks:
             lines.append(f"- {item}")
@@ -157,7 +189,9 @@ def format_markdown(report: ResearchReport) -> str:
     # ---------------------------------------------------------
 
     if report.growth_drivers:
+
         lines.append("## Growth Drivers")
+        lines.append("")
 
         for item in report.growth_drivers:
             lines.append(f"- {item}")
@@ -174,23 +208,28 @@ def format_markdown(report: ResearchReport) -> str:
     confidence = report.confidence
 
     if isinstance(confidence, dict):
+
         stars = confidence["stars"]
         level = confidence["level"]
         reasons = confidence["reasons"]
 
     elif hasattr(confidence, "stars"):
+
         stars = confidence.stars
         level = confidence.level
         reasons = confidence.reasons
 
     else:
+
         lines.append(str(confidence))
         lines.append("")
+
         stars = None
         level = None
         reasons = None
 
     if stars is not None:
+
         lines.append(stars)
         lines.append(f"Level : {level}")
         lines.append("")
@@ -200,7 +239,7 @@ def format_markdown(report: ResearchReport) -> str:
         for reason in reasons:
             lines.append(f"- {reason}")
 
-    lines.append("")
+        lines.append("")
 
     # ---------------------------------------------------------
     # DCF Valuation
@@ -211,32 +250,79 @@ def format_markdown(report: ResearchReport) -> str:
         lines.append("## DCF Valuation")
         lines.append("")
 
-        lines.append(
-            f"Forecast Cash Flow PV: {report.dcf.forecast_pv:,.0f}"
-        )
+        # -----------------------------------------------------
+        # DCF unavailable
+        # -----------------------------------------------------
 
-        lines.append(
-            f"Terminal Value: {report.dcf.terminal_value:,.0f}"
-        )
+        if getattr(report.dcf, "status", "Available") == "Unavailable":
 
-        lines.append(
-            f"Discounted Terminal Value: {report.dcf.discounted_terminal_value:,.0f}"
-        )
+            lines.append("**Status:** DCF Unavailable")
+            lines.append("")
 
-        lines.append(
-            f"Enterprise Value: {report.dcf.enterprise_value:,.0f}"
-        )
+            lines.append(
+                f"**Reason:** "
+                f"{report.dcf.reason}"
+            )
+            lines.append("")
 
-        lines.append(
-            f"Intrinsic Value: {report.dcf.intrinsic_value:,.0f}"
-        )
+            lines.append(
+                "No intrinsic value or DCF verdict is provided "
+                "because the required free cash flow data is "
+                "unavailable."
+            )
+            lines.append("")
 
-        lines.append(
-            f"Intrinsic Value / Share: {report.dcf.intrinsic_value_per_share:,.2f}"
-        )
+        # -----------------------------------------------------
+        # Valid DCF
+        # -----------------------------------------------------
 
-        lines.append(
-            f"Current Price: {report.dcf.current_price:,.2f}"
-        )
+        else:
+
+            lines.append(
+                f"Forecast Cash Flow PV: "
+                f"{report.dcf.forecast_pv:,.0f}"
+            )
+
+            lines.append(
+                f"Terminal Value: "
+                f"{report.dcf.terminal_value:,.0f}"
+            )
+
+            lines.append(
+                f"Discounted Terminal Value: "
+                f"{report.dcf.discounted_terminal_value:,.0f}"
+            )
+
+            lines.append(
+                f"Enterprise Value: "
+                f"{report.dcf.enterprise_value:,.0f}"
+            )
+
+            lines.append(
+                f"Intrinsic Value: "
+                f"{report.dcf.intrinsic_value:,.0f}"
+            )
+
+            lines.append(
+                f"Intrinsic Value / Share: "
+                f"{report.dcf.intrinsic_value_per_share:,.2f}"
+            )
+
+            lines.append(
+                f"Current Price: "
+                f"{report.dcf.current_price:,.2f}"
+            )
+
+            lines.append(
+                f"Margin of Safety: "
+                f"{report.dcf.margin_of_safety:.2f}%"
+            )
+
+            lines.append(
+                f"Verdict: "
+                f"{report.dcf.verdict}"
+            )
+
+            lines.append("")
 
     return "\n".join(lines)

@@ -138,6 +138,35 @@ class DCFEngine:
 
         forecasts = self.forecast_cashflows()
 
+        if not forecasts:
+            return DCFResult(
+                forecast_cashflows=[],
+                discounted_cashflows=[],
+
+                forecast_pv=0.0,
+                terminal_value=0.0,
+                discounted_terminal_value=0.0,
+
+                enterprise_value=0.0,
+                intrinsic_value=0.0,
+                intrinsic_value_per_share=0.0,
+
+                current_price=self.snapshot.current_price or 0.0,
+                margin_of_safety=0.0,
+
+                verdict="Unavailable",
+
+                assumptions={
+                    "growth_rate": self.choose_growth_rate(),
+                    "discount_rate": DISCOUNT_RATE,
+                    "terminal_growth": TERMINAL_GROWTH,
+                    "years": YEARS,
+                },
+
+                status="Unavailable",
+                reason="Free cash flow data is unavailable.",
+            )
+
         discounted = []
 
         forecast_pv = 0.0

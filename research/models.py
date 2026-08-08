@@ -160,6 +160,9 @@ class DCFResult:
 
     assumptions: dict | None = None
 
+    status: str = "Available"
+    reason: str = ""
+
 # ==========================================================
 # DCF Valuation (Final Report)
 # ==========================================================

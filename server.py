@@ -133,30 +133,30 @@ def analyze_company_research(company_name: str) -> str:
 
     dcf_result = dcf_engine.calculate()
 
-    markdown += "\n\n## DCF Summary\n\n"
+    if dcf_result.status == "Available":
+        markdown += "\n\n## DCF Summary\n\n"
 
-    markdown += (
-        f"Forecast PV: "
-        f"{dcf_result.forecast_pv:,.0f}\n\n"
-    )
+        markdown += (
+            f"Forecast PV: "
+            f"{dcf_result.forecast_pv:,.0f}\n\n"
+        )
 
-    markdown += (
-        f"Terminal Value: "
-        f"{dcf_result.terminal_value:,.0f}\n\n"
-    )
+        markdown += (
+            f"Terminal Value: "
+            f"{dcf_result.terminal_value:,.0f}\n\n"
+        )
 
-    markdown += (
-        f"Discounted Terminal Value: "
-        f"{dcf_result.discounted_terminal_value:,.0f}\n\n"
-    )
+        markdown += (
+            f"Discounted Terminal Value: "
+            f"{dcf_result.discounted_terminal_value:,.0f}\n\n"
+        )
 
-    markdown += (
-        f"Enterprise Value: "
-        f"{dcf_result.enterprise_value:,.0f}\n"
-    )
+        markdown += (
+            f"Enterprise Value: "
+            f"{dcf_result.enterprise_value:,.0f}\n"
+        )
 
     return markdown
-
 
 # ==========================================================
 # Portfolio Metrics
