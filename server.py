@@ -1,6 +1,9 @@
 from mcp.server.fastmcp import FastMCP
 
-from research import dcf
+from portfolio.loader import get_portfolio
+from portfolio.metrics import calculate_metrics
+from portfolio.dashboard import get_portfolio_dashboard
+
 from services.portfolio_service import get_dashboard_data
 from services.review_service import get_portfolio_review
 from services.research_service import analyze_company
@@ -10,13 +13,20 @@ from research.formatter import format_markdown
 from research.dcf import DCFEngine
 
 from tools.serialization import to_python
-from portfolio.dashboard import get_portfolio_dashboard
 
 
 mcp = FastMCP("FreedomIQ")
 
+
+# ==========================================================
+# Portfolio Summary
+# ==========================================================
+
 @mcp.tool()
 def get_portfolio_summary() -> dict:
+    """
+    Returns the current portfolio summary.
+    """
     try:
         dashboard = get_dashboard_data()
         return to_python(dashboard.summary)
@@ -30,40 +40,62 @@ def get_portfolio_summary() -> dict:
         }
 
 
+# ==========================================================
+# Portfolio Performance
+# ==========================================================
+
 @mcp.tool()
 def get_top_performers() -> list:
-    """Returns the top performing holdings."""
+    """
+    Returns the top performing holdings.
+    """
     dashboard = get_dashboard_data()
     return to_python(dashboard.top_performers)
 
 
 @mcp.tool()
 def get_top_losers() -> list:
-    """Returns the worst performing holdings."""
+    """
+    Returns the worst performing holdings.
+    """
     dashboard = get_dashboard_data()
     return to_python(dashboard.top_losers)
 
 
+# ==========================================================
+# Portfolio Health
+# ==========================================================
+
 @mcp.tool()
 def get_portfolio_health() -> dict:
-    """Returns the portfolio health assessment."""
+    """
+    Returns the portfolio health assessment.
+    """
     dashboard = get_dashboard_data()
     return to_python(dashboard.health)
 
 
 @mcp.tool()
 def get_portfolio_advice() -> list:
-    """Returns portfolio recommendations."""
+    """
+    Returns portfolio recommendations.
+    """
     dashboard = get_dashboard_data()
     return to_python(dashboard.advisor)
 
 
 @mcp.tool()
 def get_portfolio_risk() -> dict:
-    """Returns portfolio risk analysis."""
+    """
+    Returns portfolio risk analysis.
+    """
     dashboard = get_dashboard_data()
     return to_python(dashboard.risk)
 
+
+# ==========================================================
+# Complete Portfolio Review
+# ==========================================================
 
 @mcp.tool()
 def review_portfolio() -> dict:
@@ -73,11 +105,15 @@ def review_portfolio() -> dict:
     return get_portfolio_review()
 
 
+# ==========================================================
+# Company Research
+# ==========================================================
 
 @mcp.tool()
 def analyze_company_research(company_name: str) -> str:
     """
-    Analyze a company and return a formatted research report.
+    Analyze a company and return a formatted research report
+    including DCF valuation.
     """
 
     analysis = analyze_company(company_name)
@@ -86,19 +122,16 @@ def analyze_company_research(company_name: str) -> str:
 
     markdown = format_markdown(report)
 
-    return markdown
+    # ------------------------------------------------------
+    # DCF
+    # ------------------------------------------------------
 
-    # -----------------------------------------------------
-    # DCF Forecast Test
-    # -----------------------------------------------------
-
-    dcf = DCFEngine(
+    dcf_engine = DCFEngine(
         analysis.snapshot,
         analysis.financials,
     )
 
-    dcf_result = dcf.calculate()
-    forecasts = dcf.forecast_cashflows()
+    dcf_result = dcf_engine.calculate()
 
     markdown += "\n\n## DCF Summary\n\n"
 
@@ -125,17 +158,15 @@ def analyze_company_research(company_name: str) -> str:
     return markdown
 
 
-if __name__ == "__main__":
-    mcp.run()
-
-from portfolio.loader import get_portfolio
-from portfolio.analyzer import analyze_portfolio
-from portfolio.dashboard import get_portfolio_dashboard
-
-
+# ==========================================================
+# Portfolio Metrics
+# ==========================================================
 
 @mcp.tool()
-def get_portfolio_metrics():
+def get_portfolio_metrics() -> dict:
+    """
+    Returns portfolio concentration and diversification metrics.
+    """
     try:
         portfolio = get_portfolio()
 
@@ -150,42 +181,67 @@ def get_portfolio_metrics():
             "error": str(e),
             "traceback": traceback.format_exc(),
         }
+
+
+# ==========================================================
+# Portfolio Score
+# ==========================================================
+
 @mcp.tool()
-def get_portfolio_score():
+def get_portfolio_score() -> dict:
     """
     Returns the FreedomIQ Portfolio Score.
     """
-
     dashboard = get_portfolio_dashboard()
 
     return to_python(dashboard.score)
+
+
+# ==========================================================
+# AI Portfolio Advice
+# ==========================================================
 
 @mcp.tool()
 def get_portfolio_ai_advice() -> list:
     """
     Returns AI-generated portfolio recommendations.
     """
-
     dashboard = get_portfolio_dashboard()
 
     return dashboard.advice
+
+
+# ==========================================================
+# Complete Portfolio Dashboard
+# ==========================================================
 
 @mcp.tool()
 def get_portfolio_dashboard_data() -> dict:
     """
     Returns the complete FreedomIQ portfolio dashboard.
     """
-
     dashboard = get_portfolio_dashboard()
 
     return to_python(dashboard)
+
+
+# ==========================================================
+# Portfolio Decisions
+# ==========================================================
 
 @mcp.tool()
 def get_portfolio_decisions() -> list:
     """
     Returns structured portfolio decisions.
     """
-
     dashboard = get_portfolio_dashboard()
 
     return to_python(dashboard.decisions)
+
+
+# ==========================================================
+# Start MCP Server
+# ==========================================================
+
+if __name__ == "__main__":
+    mcp.run()
