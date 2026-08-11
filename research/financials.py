@@ -278,3 +278,67 @@ def get_financials(
 
         total_debt=total_debt,
     )
+def _get_free_cash_flow_history(
+    info: dict,
+    ticker_symbol: str | None = None,
+    fx_rate: float = 1.0,
+):
+    """
+    Get historical annual free cash flow from Yahoo Finance.
+
+    Returns:
+        List of dictionaries containing:
+            date
+            fcf
+    """
+
+    if ticker_symbol is None:
+        return []
+
+    try:
+
+        ticker = yf.Ticker(ticker_symbol)
+
+        cashflow = ticker.cashflow
+
+        if cashflow is None or cashflow.empty:
+            return []
+
+        if "Free Cash Flow" not in cashflow.index:
+            return []
+
+        fcf_series = (
+            cashflow.loc["Free Cash Flow"]
+            .dropna()
+            .sort_index(ascending=False)
+        )
+
+        history = []
+
+        for date, value in fcf_series.items():
+
+            try:
+
+                fcf = (
+                    float(value)
+                    * fx_rate
+                )
+
+                history.append(
+                    {
+                        "date": str(date),
+                        "fcf": fcf,
+                    }
+                )
+
+            except (
+                TypeError,
+                ValueError,
+            ):
+                continue
+
+        return history
+
+    except Exception:
+
+        return []
