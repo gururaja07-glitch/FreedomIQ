@@ -213,7 +213,19 @@ def analyze_fcf_history(fcf_history):
     else:
 
         stability = "Low"
+    # -----------------------------------------------------
+    # Volatility-aware trend
+    # -----------------------------------------------------
 
+    if stability == "Low":
+
+     if trend == "Improving":
+
+        trend = "Volatile / Improving"
+
+    elif trend == "Declining":
+
+        trend = "Volatile / Declining"
     # -----------------------------------------------------
     # Overall quality
     # -----------------------------------------------------

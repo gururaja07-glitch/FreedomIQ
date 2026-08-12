@@ -186,6 +186,12 @@ def get_financials(
     currency_conversion_available = (
         fx_rate is not None
     )
+    fcf_history = _get_free_cash_flow_history(
+      info,
+      ticker_symbol,
+      fx_rate,
+    )
+
 
     # -----------------------------------------------------
     # Basic financial metrics
@@ -277,6 +283,8 @@ def get_financials(
         cash=cash,
 
         total_debt=total_debt,
+
+        fcf_history=fcf_history,
     )
 def _get_free_cash_flow_history(
     info: dict,

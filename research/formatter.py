@@ -1,4 +1,5 @@
-from research.models import ResearchReport
+from research.models import CompanyAnalysis, ResearchReport
+from research.report import build_report
 
 from research.utils import (
     format_indian_currency,
@@ -16,10 +17,13 @@ def _format_percent(value):
     return f"{value * 100:.2f}%"
 
 
-def format_markdown(report: ResearchReport) -> str:
+def format_markdown(report: ResearchReport | CompanyAnalysis) -> str:
     """
-    Converts a ResearchReport into a Markdown report.
+    Converts an analysis or research report into a Markdown report.
     """
+
+    if isinstance(report, CompanyAnalysis):
+        report = build_report(report)
 
     lines = []
 
@@ -708,6 +712,101 @@ def format_markdown(report: ResearchReport) -> str:
                     f"{assumptions['terminal_value_percentage']:.2f}%"
                 )
 
-            lines.append("")
+        # -------------------------------------------------
+        # Historical FCF Quality Audit
+        # -------------------------------------------------
+
+        if "fcf_quality" in assumptions:
+
+            lines.append(
+                f"- FCF Quality: "
+                f"{assumptions['fcf_quality']}"
+            )
+
+        if "fcf_stability" in assumptions:
+
+            lines.append(
+                f"- FCF Stability: "
+                f"{assumptions['fcf_stability']}"
+            )
+
+        if "fcf_trend" in assumptions:
+
+            lines.append(
+                f"- FCF Trend: "
+                f"{assumptions['fcf_trend']}"
+            )
+
+        if "historical_fcf_cagr" in assumptions:
+
+            value = assumptions[
+                "historical_fcf_cagr"
+            ]
+
+            if value is None:
+                display = "N/A"
+            else:
+                display = _format_percent(value)
+
+            lines.append(
+                f"- Historical FCF CAGR: "
+                f"{display}"
+            )
+
+        if "historical_fcf_average_growth" in assumptions:
+
+            value = assumptions[
+                "historical_fcf_average_growth"
+            ]
+
+            if value is None:
+                display = "N/A"
+            else:
+                display = _format_percent(value)
+
+            lines.append(
+                f"- Historical FCF Average Growth: "
+                f"{display}"
+            )
+
+        if "historical_fcf_volatility" in assumptions:
+
+            value = assumptions[
+                "historical_fcf_volatility"
+            ]
+
+            if value is None:
+                display = "N/A"
+            else:
+                display = _format_percent(value)
+
+            lines.append(
+                f"- Historical FCF Volatility: "
+                f"{display}"
+            )
+
+        if "positive_fcf_years" in assumptions:
+
+            lines.append(
+                f"- Positive FCF Years: "
+                f"{assumptions['positive_fcf_years']}"
+            )
+
+        if "negative_fcf_years" in assumptions:
+
+            lines.append(
+                f"- Negative FCF Years: "
+                f"{assumptions['negative_fcf_years']}"
+            )
+
+        lines.append("")
+        if "terminal_value_percentage" in assumptions:
+
+            lines.append(
+                f"- Base Terminal Value Contribution: "
+                f"{assumptions['terminal_value_percentage']:.2f}%"
+            )
+
+        lines.append("")
 
     return "\n".join(lines)

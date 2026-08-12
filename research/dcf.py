@@ -29,7 +29,7 @@ from research.dcf_config import (
     FADE_FACTOR_YEAR_10,
 )
 
-
+from research.fcf_analysis import analyze_fcf_history
 class DCFEngine:
 
     def __init__(
@@ -440,6 +440,14 @@ class DCFEngine:
             )
 
         # -------------------------------------------------
+        # Historical FCF Quality Analysis
+        # -------------------------------------------------
+
+        fcf_analysis = analyze_fcf_history(
+            self.financials.fcf_history
+        )
+
+        # -------------------------------------------------
         # Scenario starting growth rates
         # -------------------------------------------------
 
@@ -557,6 +565,41 @@ class DCFEngine:
         assumptions = {
 
             "base_fcf": base_fcf,
+
+            # Historical FCF quality audit.
+            # These fields do not alter the DCF valuation.
+
+            "fcf_quality": (
+                fcf_analysis["quality"]
+            ),
+
+            "fcf_stability": (
+                fcf_analysis["stability"]
+            ),
+
+            "fcf_trend": (
+                fcf_analysis["trend"]
+            ),
+
+            "historical_fcf_cagr": (
+                fcf_analysis["fcf_cagr"]
+            ),
+
+            "historical_fcf_average_growth": (
+                fcf_analysis["average_growth"]
+            ),
+
+            "historical_fcf_volatility": (
+                fcf_analysis["volatility"]
+            ),
+
+            "positive_fcf_years": (
+                fcf_analysis["positive_years"]
+            ),
+
+            "negative_fcf_years": (
+                fcf_analysis["negative_years"]
+            ),
 
             "growth_method": (
                 "Revenue growth mapped to "

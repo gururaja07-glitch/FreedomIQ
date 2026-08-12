@@ -36,6 +36,8 @@ class FinancialSummary:
 
     total_debt: float | None = None
 
+    fcf_history: list | None = None
+
 
 # ==========================================================
 # Valuation Summary
@@ -161,6 +163,7 @@ class DCFResult:
     assumptions: dict | None = None
 
     status: str = "Available"
+
     reason: str = ""
 
 # ==========================================================
