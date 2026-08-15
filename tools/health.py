@@ -55,7 +55,7 @@ def calculate_stock_concentration_score(df):
     Score based on largest holding.
     """
 
-    largest = df["WeightPct"].max()
+    largest = df["Weight %"].max()
 
     if largest <= 10:
         return 20

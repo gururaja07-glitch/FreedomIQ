@@ -94,28 +94,4 @@ def get_portfolio() -> pd.DataFrame:
         ]
     )
 
-    # Derived metrics
-    df["InvestedValue"] = df["Quantity"] * df["BuyPrice"]
-    df["CurrentValue"] = df["Quantity"] * df["CurrentPrice"]
-    df["ProfitLoss"] = df["CurrentValue"] - df["InvestedValue"]
-    df["ReturnPct"] = (
-        df["ProfitLoss"] / df["InvestedValue"] * 100
-    ).round(2)
-
-    total_value = df["CurrentValue"].sum()
-
-    if total_value > 0:
-        df["WeightPct"] = (
-            df["CurrentValue"] / total_value * 100
-        ).round(2)
-    else:
-        df["WeightPct"] = 0.0
-
-    df = df.sort_values(
-        by="CurrentValue",
-        ascending=False,
-    ).reset_index(drop=True)
-
-    print(df.columns.tolist())
-
     return df
