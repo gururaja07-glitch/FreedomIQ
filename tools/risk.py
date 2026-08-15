@@ -13,9 +13,9 @@ Version : 0.1
 from tools.rules import (
     MAX_STOCK_WEIGHT,
     MAX_SECTOR_WEIGHT,
+    MAX_TOP3_WEIGHT,
     TARGET_CASH_WEIGHT,
 )
-
 
 def calculate_concentration_risk(df):
     """
@@ -40,7 +40,34 @@ def calculate_concentration_risk(df):
         "High",
         f"Largest holding is {largest:.1f}%."
     )
+def calculate_top3_concentration(df):
+    """
+    Risk based on combined weight of the top 3 holdings.
+    """
 
+    top3_weight = (
+        df["Weight %"]
+        .sort_values(ascending=False)
+        .head(3)
+        .sum()
+    )
+
+    if top3_weight <= MAX_TOP3_WEIGHT:
+        return (
+            "Low",
+            f"Top 3 holdings account for {top3_weight:.1f}%."
+        )
+
+    if top3_weight <= MAX_TOP3_WEIGHT + 10:
+        return (
+            "Medium",
+            f"Top 3 holdings account for {top3_weight:.1f}%."
+        )
+
+    return (
+        "High",
+        f"Top 3 holdings account for {top3_weight:.1f}%."
+    )
 
 def calculate_sector_risk(df):
     """
@@ -108,13 +135,14 @@ def calculate_portfolio_risk(df, allocation):
     """
     Calculate portfolio risk summary.
     """
-
     concentration = calculate_concentration_risk(df)
+    top3 = calculate_top3_concentration(df)
     sector = calculate_sector_risk(df)
     cash = calculate_cash_risk(allocation)
 
     levels = [
         concentration[0],
+        top3[0],
         sector[0],
         cash[0],
     ]
@@ -129,6 +157,7 @@ def calculate_portfolio_risk(df, allocation):
     return (
         {
             "Concentration": concentration,
+            "Top 3 Concentration": top3,
             "Sector": sector,
             "Cash": cash,
         },
