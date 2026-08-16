@@ -1,7 +1,7 @@
 from mcp.server.fastmcp import FastMCP
 
-from portfolio.loader import get_portfolio
-from portfolio.metrics import calculate_metrics
+from portfolio.loader import get_portfolio as legacy_get_portfolio
+from portfolio.metrics import calculate_metrics as legacy_calculate_metrics
 from portfolio.dashboard import get_portfolio_dashboard
 
 from services.portfolio_service import get_dashboard_data
@@ -12,7 +12,12 @@ from research.report import build_report
 from research.formatter import format_markdown
 from research.dcf import DCFEngine
 
+from tools.portfolio import get_portfolio
+from tools.analytics import calculate_metrics
 from tools.serialization import to_python
+from services.portfolio_decision_service import (
+    get_portfolio_decisions as generate_portfolio_decisions
+)
 
 
 mcp = FastMCP("FreedomIQ")
@@ -158,6 +163,7 @@ def analyze_company_research(company_name: str) -> str:
 
     return markdown
 
+
 # ==========================================================
 # Portfolio Metrics
 # ==========================================================
@@ -165,14 +171,29 @@ def analyze_company_research(company_name: str) -> str:
 @mcp.tool()
 def get_portfolio_metrics() -> dict:
     """
-    Returns portfolio concentration and diversification metrics.
+    Returns portfolio concentration metrics.
     """
     try:
         portfolio = get_portfolio()
+        df = calculate_metrics(portfolio)
 
-        metrics = calculate_metrics(portfolio)
+        sorted_df = df.sort_values(
+            "Weight %",
+            ascending=False
+        )
 
-        return to_python(metrics)
+        return {
+            "Top 5 Weight": round(
+                sorted_df.head(5)["Weight %"].sum(), 2
+            ),
+            "Top 10 Weight": round(
+                sorted_df.head(10)["Weight %"].sum(), 2
+            ),
+            "Largest Holding": sorted_df.iloc[0]["Stock"],
+            "Largest Weight": round(
+                sorted_df.iloc[0]["Weight %"], 2
+            ),
+        }
 
     except Exception as e:
         import traceback
@@ -182,7 +203,6 @@ def get_portfolio_metrics() -> dict:
             "traceback": traceback.format_exc(),
         }
 
-
 # ==========================================================
 # Portfolio Score
 # ==========================================================
@@ -190,11 +210,13 @@ def get_portfolio_metrics() -> dict:
 @mcp.tool()
 def get_portfolio_score() -> dict:
     """
-    Returns the FreedomIQ Portfolio Score.
+    Returns the current FreedomIQ portfolio health score.
     """
-    dashboard = get_portfolio_dashboard()
+    dashboard = get_dashboard_data()
 
-    return to_python(dashboard.score)
+    return {
+        "Health Score": dashboard.health["Total"]
+    }
 
 
 # ==========================================================
@@ -220,7 +242,7 @@ def get_portfolio_dashboard_data() -> dict:
     """
     Returns the complete FreedomIQ portfolio dashboard.
     """
-    dashboard = get_portfolio_dashboard()
+    dashboard = get_dashboard_data()
 
     return to_python(dashboard)
 
@@ -228,16 +250,12 @@ def get_portfolio_dashboard_data() -> dict:
 # ==========================================================
 # Portfolio Decisions
 # ==========================================================
-
 @mcp.tool()
 def get_portfolio_decisions() -> list:
     """
-    Returns structured portfolio decisions.
+    Returns portfolio-level investment decisions.
     """
-    dashboard = get_portfolio_dashboard()
-
-    return to_python(dashboard.decisions)
-
+    return to_python(generate_portfolio_decisions())
 
 # ==========================================================
 # Start MCP Server
