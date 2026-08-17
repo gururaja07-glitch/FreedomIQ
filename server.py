@@ -226,11 +226,11 @@ def get_portfolio_score() -> dict:
 @mcp.tool()
 def get_portfolio_ai_advice() -> list:
     """
-    Returns AI-generated portfolio recommendations.
+    Returns portfolio recommendations.
     """
-    dashboard = get_portfolio_dashboard()
+    dashboard = get_dashboard_data()
 
-    return dashboard.advice
+    return to_python(dashboard.advisor)
 
 
 # ==========================================================
