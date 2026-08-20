@@ -22,6 +22,14 @@ class Snapshot:
 # ==========================================================
 
 @dataclass
+class FinancialDataQuality:
+    fcf_available: bool
+    fcf_history_available: bool
+    cash_available: bool
+    debt_available: bool
+    overall: str
+
+@dataclass
 class FinancialSummary:
     revenue_growth: str
     profit_growth: str
@@ -37,6 +45,8 @@ class FinancialSummary:
     total_debt: float | None = None
 
     fcf_history: list | None = None
+
+    data_quality: FinancialDataQuality | None = None
 
 
 # ==========================================================

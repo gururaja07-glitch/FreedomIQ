@@ -1,6 +1,9 @@
 import yfinance as yf
 
-from research.models import FinancialSummary
+from research.models import (
+    FinancialSummary,
+    FinancialDataQuality,
+)
 from research.utils import (
     format_percent,
     format_ratio,
@@ -269,7 +272,51 @@ def get_financials(
 
             cash = info.get("totalCash")
             total_debt = info.get("totalDebt")
+    # -----------------------------------------------------
+    # Financial data quality audit
+    # -----------------------------------------------------
 
+    fcf_available = (
+        free_cash_flow is not None
+    )
+
+    fcf_history_available = bool(
+        fcf_history
+    )
+
+    cash_available = (
+        cash is not None
+    )
+
+    debt_available = (
+        total_debt is not None
+    )
+
+    available_fields = sum(
+        [
+            fcf_available,
+            fcf_history_available,
+            cash_available,
+            debt_available,
+        ]
+    )
+
+    if available_fields == 4:
+        data_quality_overall = "Good"
+
+    elif available_fields >= 2:
+        data_quality_overall = "Partial"
+
+    else:
+        data_quality_overall = "Poor"
+
+    data_quality = FinancialDataQuality(
+        fcf_available=fcf_available,
+        fcf_history_available=fcf_history_available,
+        cash_available=cash_available,
+        debt_available=debt_available,
+        overall=data_quality_overall,
+    )
     return FinancialSummary(
         revenue_growth=revenue_growth,
         profit_growth=profit_growth,
@@ -285,6 +332,8 @@ def get_financials(
         total_debt=total_debt,
 
         fcf_history=fcf_history,
+
+        data_quality=data_quality,
     )
 def _get_free_cash_flow_history(
     info: dict,
