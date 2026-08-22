@@ -590,6 +590,25 @@ def make_investment_decision(
             confidence=confidence,
         )
     )
+    # ------------------------------------------------------
+    # Financial data quality
+    # ------------------------------------------------------
+
+    financial_data_quality = "Unavailable"
+
+    data_quality = getattr(
+        company_analysis.financials,
+        "data_quality",
+        None,
+    )
+
+    if data_quality is not None:
+
+        financial_data_quality = getattr(
+            data_quality,
+            "overall",
+            "Unavailable",
+        )
 
     reasons.insert(
         0,
@@ -605,6 +624,10 @@ def make_investment_decision(
         decision=decision,
         fundamental_rating=rating,
         valuation_view=valuation,
+        fcf_quality=fcf_quality,
+        dcf_verdict=dcf_verdict,
+        financial_data_quality=financial_data_quality,
+        evidence_summary=reasoning_summary,
         portfolio_weight=weight,
         portfolio_risk=portfolio_risk,
         confidence=confidence,
