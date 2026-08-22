@@ -1,4 +1,7 @@
 from mcp.server.fastmcp import FastMCP
+from services.decision_service import (
+    get_investment_decision as generate_investment_decision
+)
 
 from portfolio.loader import get_portfolio as legacy_get_portfolio
 from portfolio.metrics import calculate_metrics as legacy_calculate_metrics
@@ -126,6 +129,31 @@ def analyze_company_research(company_name: str) -> str:
     report = build_report(analysis)
 
     markdown = format_markdown(report)
+    # ==========================================================
+# Investment Decision
+# ==========================================================
+
+@mcp.tool()
+def get_investment_decision(company_name: str) -> dict:
+    """
+    Returns the personal investment decision for a portfolio holding.
+
+    Includes:
+    - Fundamental rating
+    - Valuation
+    - FCF quality
+    - DCF verdict
+    - Financial data quality
+    - Portfolio exposure
+    - Confidence
+    - Evidence
+    - Risks
+    """
+    decision = generate_investment_decision(
+        company_name
+    )
+
+    return to_python(decision)
 
     # ------------------------------------------------------
     # DCF
