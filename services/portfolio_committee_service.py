@@ -25,19 +25,35 @@ def get_portfolio_investment_committee() -> PortfolioCommitteeResult:
     # ------------------------------------------------------
     # 2. Generate individual company decisions
     # ------------------------------------------------------
-
     company_decisions = []
 
-    for company in portfolio["Stock"].tolist():
+    for _, row in portfolio.iterrows():
+
+        sector = str(
+            row.get("Sector", "")
+        ).strip().lower()
+
+        industry = str(
+            row.get("Industry", "")
+        ).strip().lower()
+
+    # Company analysis applies only to actual companies.
+        if sector in {"gold", "cash"}:
+            continue
+
+        if industry in {"", "unknown"}:
+            continue
+
+        company = row["Stock"]
 
         decision = get_investment_decision(
             company
-        )
+       )
 
         company_decisions.append(
-            decision
-        )
+           decision
 
+        )
     # ------------------------------------------------------
     # 3. Existing portfolio-level decisions
     # ------------------------------------------------------

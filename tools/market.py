@@ -1,38 +1,54 @@
 import yfinance as yf
 
 
-def update_prices(df):
+NON_QUOTED_SECTORS = {"gold", "silver", "cash"}
 
+
+def update_price(
+    stock: str,
+    current_price: float,
+    *,
+    sector: str | None = None,
+    ticker: str | None = None,
+) -> float:
+    """Return the latest closing price, or the last known price on failure.
+
+    ``ticker`` is preferred because portfolio enrichment already resolves
+    company names such as ``ICICI Bank`` to their Yahoo Finance symbols.
+    """
+    if str(sector or "").strip().lower() in NON_QUOTED_SECTORS:
+        return current_price
+
+    symbol = str(ticker or stock).strip().upper()
+    if not symbol:
+        return current_price
+    if "." not in symbol:
+        symbol = f"{symbol}.NS"
+
+    try:
+        data = yf.Ticker(symbol).history(period="1d")
+        if data.empty:
+            print(f"Price not found for {stock}. Using previous price.")
+            return current_price
+        return round(float(data["Close"].iloc[-1]), 2)
+    except Exception as error:
+        print(f"Error updating {stock}: {error}")
+        return current_price
+
+
+def update_prices(df):
+    """Update the ``CurrentPrice`` column for every quoted holding."""
     prices = []
 
     for _, row in df.iterrows():
-
-        stock = row["Stock"]
-        sector = str(row["Sector"]).strip().lower()
-        old_price = row["CurrentPrice"]
-
-        # Skip assets that don't have Yahoo Finance quotes
-        if sector in ["gold", "silver", "cash"]:
-            prices.append(old_price)
-            continue
-
-        symbol = stock.strip().upper() + ".NS"
-
-        try:
-            ticker = yf.Ticker(symbol)
-            data = ticker.history(period="1d")
-
-            if data.empty:
-                print(f"⚠ Price not found for {stock}. Using previous price.")
-                prices.append(old_price)
-            else:
-                latest_price = round(data["Close"].iloc[-1], 2)
-                prices.append(latest_price)
-
-        except Exception as e:
-            print(f"⚠ Error updating {stock}: {e}")
-            prices.append(old_price)
+        prices.append(
+            update_price(
+                row["Stock"],
+                row["CurrentPrice"],
+                sector=row.get("Sector"),
+                ticker=row.get("Ticker"),
+            )
+        )
 
     df["CurrentPrice"] = prices
-
     return df

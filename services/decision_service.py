@@ -3,6 +3,7 @@ from tools.portfolio import get_portfolio
 from tools.analytics import calculate_metrics, calculate_asset_allocation
 from tools.risk import calculate_portfolio_risk
 from tools.decision import make_investment_decision
+from tools.market import update_prices
 
 
 def get_investment_decision(company_name: str):
@@ -11,12 +12,13 @@ def get_investment_decision(company_name: str):
     using company research and portfolio context.
     """
 
-    # Load portfolio
     df = get_portfolio()
+
+    # Use the same refreshed price state as the portfolio dashboard
+    df = update_prices(df)
 
     # Calculate portfolio metrics
     df = calculate_metrics(df)
-
     # Find the requested holding
     matches = df[df["Stock"].str.upper() == company_name.upper()]
 

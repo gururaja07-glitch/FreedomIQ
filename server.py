@@ -21,7 +21,9 @@ from tools.serialization import to_python
 from services.portfolio_decision_service import (
     get_portfolio_decisions as generate_portfolio_decisions
 )
-
+from services.portfolio_committee_service import (
+    get_portfolio_investment_committee as generate_portfolio_committee,
+)
 
 mcp = FastMCP("FreedomIQ")
 
@@ -284,6 +286,18 @@ def get_portfolio_decisions() -> list:
     Returns portfolio-level investment decisions.
     """
     return to_python(generate_portfolio_decisions())
+# ==========================================================
+# Portfolio Investment Committee
+# ==========================================================
+
+@mcp.tool()
+def get_portfolio_investment_committee() -> dict:
+    """
+    Returns the complete portfolio investment committee analysis.
+    """
+    return to_python(
+        generate_portfolio_committee()
+    )
 
 # ==========================================================
 # Start MCP Server
