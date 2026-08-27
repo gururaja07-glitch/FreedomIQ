@@ -2,6 +2,9 @@ from models.portfolio_committee import PortfolioCommitteeResult
 from services.decision_service import get_investment_decision
 from services.portfolio_decision_service import get_portfolio_decisions
 from tools.portfolio import get_portfolio
+from services.portfolio_action_service import (
+    generate_portfolio_action_plan,
+)
 
 
 def get_portfolio_investment_committee() -> PortfolioCommitteeResult:
@@ -129,10 +132,16 @@ def get_portfolio_investment_committee() -> PortfolioCommitteeResult:
     # ------------------------------------------------------
     # 6. Return structured committee result
     # ------------------------------------------------------
-
+    prioritized_actions = (
+        generate_portfolio_action_plan(
+            company_decisions=company_decisions,
+            portfolio_actions=portfolio_actions,
+        )
+    )
     return PortfolioCommitteeResult(
         company_decisions=company_decisions,
         portfolio_actions=portfolio_actions,
         summary=summary,
         confidence=confidence,
+        prioritized_actions=prioritized_actions,
     )

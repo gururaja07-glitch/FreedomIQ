@@ -2,6 +2,7 @@ from dataclasses import dataclass
 
 from models.decision import InvestmentDecision
 from models.portfolio_decision import PortfolioDecision
+from models.portfolio_action import PortfolioAction
 
 
 @dataclass
@@ -17,5 +18,6 @@ class PortfolioCommitteeResult:
 
     company_decisions: list[InvestmentDecision]
     portfolio_actions: list[PortfolioDecision]
+    prioritized_actions: list[PortfolioAction]
     summary: str
     confidence: str
