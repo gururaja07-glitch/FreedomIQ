@@ -1,26 +1,51 @@
 from services.research_service import analyze_company
 from tools.portfolio import get_portfolio
-from tools.analytics import calculate_metrics, calculate_asset_allocation
+from tools.analytics import (
+    calculate_metrics,
+    calculate_asset_allocation,
+)
 from tools.risk import calculate_portfolio_risk
 from tools.decision import make_investment_decision
 from tools.market import update_prices
 
 
-def get_investment_decision(company_name: str):
+def get_investment_decision(
+    company_name: str,
+    portfolio=None,
+    portfolio_risk: str | None = None,
+):
     """
     Generate a personal investment decision
     using company research and portfolio context.
+
+    When portfolio context is supplied, it is reused.
+    This avoids rebuilding the portfolio for every
+    company during portfolio-level analysis.
     """
 
-    df = get_portfolio()
+    # ------------------------------------------------------
+    # Portfolio context
+    # ------------------------------------------------------
 
-    # Use the same refreshed price state as the portfolio dashboard
-    df = update_prices(df)
+    if portfolio is None:
 
-    # Calculate portfolio metrics
-    df = calculate_metrics(df)
-    # Find the requested holding
-    matches = df[df["Stock"].str.upper() == company_name.upper()]
+        portfolio = get_portfolio()
+
+        # Use the same refreshed price state as
+        # the portfolio dashboard.
+        portfolio = update_prices(portfolio)
+
+        # Calculate portfolio metrics.
+        portfolio = calculate_metrics(portfolio)
+
+    # ------------------------------------------------------
+    # Find requested holding
+    # ------------------------------------------------------
+
+    matches = portfolio[
+        portfolio["Stock"].str.upper()
+        == company_name.upper()
+    ]
 
     if matches.empty:
         raise ValueError(
@@ -29,24 +54,37 @@ def get_investment_decision(company_name: str):
 
     portfolio_row = matches.iloc[0]
 
-    # Calculate portfolio risk
-    allocation = calculate_asset_allocation(df)
+    # ------------------------------------------------------
+    # Portfolio risk
+    # ------------------------------------------------------
 
-    _, overall_risk = calculate_portfolio_risk(
-        df,
-        allocation,
-    )
+    if portfolio_risk is None:
 
-    # Research the company
+        allocation = calculate_asset_allocation(
+            portfolio
+        )
+
+        _, portfolio_risk = calculate_portfolio_risk(
+            portfolio,
+            allocation,
+        )
+
+    # ------------------------------------------------------
+    # Company research
+    # ------------------------------------------------------
+
     company_analysis = analyze_company(
         company_name
     )
 
-    # Make personal investment decision
+    # ------------------------------------------------------
+    # Investment decision
+    # ------------------------------------------------------
+
     decision = make_investment_decision(
         company_analysis,
         portfolio_row,
-        overall_risk,
+        portfolio_risk,
     )
 
     return decision

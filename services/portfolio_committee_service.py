@@ -1,10 +1,24 @@
 from models.portfolio_committee import PortfolioCommitteeResult
-from services.decision_service import get_investment_decision
-from services.portfolio_decision_service import get_portfolio_decisions
-from tools.portfolio import get_portfolio
+
+from services.decision_service import (
+    get_investment_decision,
+)
+
+from services.portfolio_decision_service import (
+    get_portfolio_decisions,
+)
+
 from services.portfolio_action_service import (
     generate_portfolio_action_plan,
 )
+
+from tools.portfolio import get_portfolio
+from tools.market import update_prices
+from tools.analytics import (
+    calculate_metrics,
+    calculate_asset_allocation,
+)
+from tools.risk import calculate_portfolio_risk
 
 
 def get_portfolio_investment_committee() -> PortfolioCommitteeResult:
@@ -14,20 +28,43 @@ def get_portfolio_investment_committee() -> PortfolioCommitteeResult:
     Combines:
     - Individual company investment decisions
     - Existing portfolio-level decisions
+    - Prioritized portfolio actions
 
-    This service orchestrates existing decision engines.
-    It does not recalculate financial or portfolio metrics.
+    Portfolio context is calculated once and reused
+    across all company decisions.
     """
 
     # ------------------------------------------------------
-    # 1. Load portfolio
+    # 1. Load and prepare portfolio ONCE
     # ------------------------------------------------------
 
     portfolio = get_portfolio()
 
+    portfolio = update_prices(
+        portfolio
+    )
+
+    portfolio = calculate_metrics(
+        portfolio
+    )
+
     # ------------------------------------------------------
-    # 2. Generate individual company decisions
+    # 2. Calculate portfolio risk ONCE
     # ------------------------------------------------------
+
+    allocation = calculate_asset_allocation(
+        portfolio
+    )
+
+    _, overall_risk = calculate_portfolio_risk(
+        portfolio,
+        allocation,
+    )
+
+    # ------------------------------------------------------
+    # 3. Generate individual company decisions
+    # ------------------------------------------------------
+
     company_decisions = []
 
     for _, row in portfolio.iterrows():
@@ -40,7 +77,8 @@ def get_portfolio_investment_committee() -> PortfolioCommitteeResult:
             row.get("Industry", "")
         ).strip().lower()
 
-    # Company analysis applies only to actual companies.
+        # Company analysis applies only to
+        # actual companies.
         if sector in {"gold", "cash"}:
             continue
 
@@ -50,15 +88,17 @@ def get_portfolio_investment_committee() -> PortfolioCommitteeResult:
         company = row["Stock"]
 
         decision = get_investment_decision(
-            company
-       )
+            company,
+            portfolio=portfolio,
+            portfolio_risk=overall_risk,
+        )
 
         company_decisions.append(
-           decision
-
+            decision
         )
+
     # ------------------------------------------------------
-    # 3. Existing portfolio-level decisions
+    # 4. Existing portfolio-level decisions
     # ------------------------------------------------------
 
     portfolio_actions = (
@@ -66,7 +106,7 @@ def get_portfolio_investment_committee() -> PortfolioCommitteeResult:
     )
 
     # ------------------------------------------------------
-    # 4. Portfolio synthesis
+    # 5. Portfolio synthesis
     # ------------------------------------------------------
 
     add_count = sum(
@@ -101,7 +141,7 @@ def get_portfolio_investment_committee() -> PortfolioCommitteeResult:
     )
 
     # ------------------------------------------------------
-    # 5. Committee confidence
+    # 6. Committee confidence
     # ------------------------------------------------------
 
     if not company_decisions:
@@ -130,18 +170,24 @@ def get_portfolio_investment_committee() -> PortfolioCommitteeResult:
             confidence = "Low"
 
     # ------------------------------------------------------
-    # 6. Return structured committee result
+    # 7. Prioritized action plan
     # ------------------------------------------------------
+
     prioritized_actions = (
         generate_portfolio_action_plan(
             company_decisions=company_decisions,
             portfolio_actions=portfolio_actions,
         )
     )
+
+    # ------------------------------------------------------
+    # 8. Return structured committee result
+    # ------------------------------------------------------
+
     return PortfolioCommitteeResult(
         company_decisions=company_decisions,
         portfolio_actions=portfolio_actions,
+        prioritized_actions=prioritized_actions,
         summary=summary,
         confidence=confidence,
-        prioritized_actions=prioritized_actions,
     )
