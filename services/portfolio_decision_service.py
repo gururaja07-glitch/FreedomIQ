@@ -2,7 +2,7 @@ from services.portfolio_service import get_dashboard_data
 from models.portfolio_decision import PortfolioDecision
 
 
-def get_portfolio_decisions():
+def get_portfolio_decisions(dashboard=None):
     """
     Generate portfolio-level investment decisions.
 
@@ -13,9 +13,13 @@ def get_portfolio_decisions():
     - Rebalancing
 
     This service does not recalculate portfolio metrics.
+
+    If dashboard data is supplied, it is reused instead
+    of rebuilding the portfolio dashboard.
     """
 
-    dashboard = get_dashboard_data()
+    if dashboard is None:
+        dashboard = get_dashboard_data()
 
     decisions = []
 
@@ -72,8 +76,10 @@ def get_portfolio_decisions():
 
             decisions.append(
                 PortfolioDecision(
-                    issue="Top-3 portfolio concentration "
-                          "requires attention.",
+                    issue=(
+                        "Top-3 portfolio concentration "
+                        "requires attention."
+                    ),
                     reason=top3_reason,
                     action=(
                         "Direct new investments toward "
@@ -105,8 +111,10 @@ def get_portfolio_decisions():
 
             decisions.append(
                 PortfolioDecision(
-                    issue="Sector concentration requires "
-                          "attention.",
+                    issue=(
+                        "Sector concentration requires "
+                        "attention."
+                    ),
                     reason=sector_reason,
                     action=(
                         "Avoid increasing exposure to the "
