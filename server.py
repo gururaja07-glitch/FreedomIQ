@@ -24,6 +24,8 @@ from services.portfolio_decision_service import (
 from services.portfolio_committee_service import (
     get_portfolio_investment_committee as generate_portfolio_committee,
 )
+from services.prepare_portfolio_data import prepare_portfolio_data
+from tools.analytics import calculate_portfolio_summary
 
 mcp = FastMCP("FreedomIQ")
 
@@ -38,8 +40,9 @@ def get_portfolio_summary() -> dict:
     Returns the current portfolio summary.
     """
     try:
-        dashboard = get_dashboard_data()
-        return to_python(dashboard.summary)
+        df = prepare_portfolio_data()
+        summary = calculate_portfolio_summary(df)
+        return summary
 
     except Exception as e:
         import traceback
@@ -48,7 +51,6 @@ def get_portfolio_summary() -> dict:
             "error": str(e),
             "traceback": traceback.format_exc(),
         }
-
 
 # ==========================================================
 # Portfolio Performance
