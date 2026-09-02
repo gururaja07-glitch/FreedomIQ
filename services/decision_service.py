@@ -1,4 +1,5 @@
 from services.research_service import analyze_company
+from services.quarterly_service import get_quarterly_result
 from tools.portfolio import get_portfolio
 from tools.analytics import (
     calculate_metrics,
@@ -78,6 +79,14 @@ def get_investment_decision(
     )
 
     # ------------------------------------------------------
+    # Latest quarterly result
+    # ------------------------------------------------------
+
+    quarterly_result = get_quarterly_result(
+        company_name
+    )
+
+    # ------------------------------------------------------
     # Investment decision
     # ------------------------------------------------------
 
@@ -85,6 +94,7 @@ def get_investment_decision(
         company_analysis,
         portfolio_row,
         portfolio_risk,
+        quarterly_result,
     )
 
     return decision

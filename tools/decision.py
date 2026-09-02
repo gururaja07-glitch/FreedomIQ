@@ -344,6 +344,7 @@ def make_investment_decision(
     company_analysis,
     portfolio_row,
     portfolio_risk,
+    quarterly_result=None,
 ):
     """
     Generate an integrated investment decision.
@@ -498,10 +499,52 @@ def make_investment_decision(
         risks.append(
             dcf_risk
         )
+    # ------------------------------------------------------
+    # 5. Latest quarterly result
+    # ------------------------------------------------------
+
+    quarterly_assessment = "Unavailable"
+    quarterly_positive_changes = []
+    quarterly_negative_changes = []
+
+    if quarterly_result is not None:
+
+        quarterly_assessment = (
+            quarterly_result.assessment
+            or "Unavailable"
+        )
+
+        quarterly_positive_changes = (
+            quarterly_result.positive_changes
+            or []
+        )
+
+        quarterly_negative_changes = (
+            quarterly_result.negative_changes
+            or []
+        )
+
+        reasons.append(
+            "Latest quarterly result assessment is "
+            f"{quarterly_assessment}."
+        )
+
+        for change in quarterly_positive_changes:
+
+            reasons.append(
+                f"Quarterly development: {change}"
+            )
+
+        for change in quarterly_negative_changes:
+
+            risks.append(
+                f"Quarterly development: {change}"
+            )
 
     # ------------------------------------------------------
-    # 5. Portfolio concentration
+    # 6. Portfolio concentration
     # ------------------------------------------------------
+
 
     if weight >= 20:
 
@@ -631,6 +674,9 @@ def make_investment_decision(
         portfolio_weight=weight,
         portfolio_risk=portfolio_risk,
         confidence=confidence,
+        quarterly_assessment=quarterly_assessment,
+        quarterly_positive_changes=quarterly_positive_changes,
+        quarterly_negative_changes=quarterly_negative_changes,
         reasons=reasons,
         risks=risks,
     )
