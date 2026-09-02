@@ -26,6 +26,8 @@ from services.portfolio_committee_service import (
 )
 from services.prepare_portfolio_data import prepare_portfolio_data
 from tools.analytics import calculate_portfolio_summary
+from tools.analytics import get_top_performers as top_performer
+from tools.analytics import get_top_losers as top_loser
 
 mcp = FastMCP("FreedomIQ")
 
@@ -58,21 +60,21 @@ def get_portfolio_summary() -> dict:
 
 @mcp.tool()
 def get_top_performers() -> list:
-    """
-    Returns the top performing holdings.
-    """
-    dashboard = get_dashboard_data()
-    return to_python(dashboard.top_performers)
+    """Returns the top 3 performing holdings."""
 
+    df = prepare_portfolio_data()
+    top3 = top_performer(df, top_n=3)
+
+    return to_python(top3)
 
 @mcp.tool()
 def get_top_losers() -> list:
-    """
-    Returns the worst performing holdings.
-    """
-    dashboard = get_dashboard_data()
-    return to_python(dashboard.top_losers)
+    """Returns the bottom 3 performing holdings."""
 
+    df = prepare_portfolio_data()
+    bottom3 = top_loser(df, top_n=3)
+
+    return to_python(bottom3)
 
 # ==========================================================
 # Portfolio Health
@@ -133,32 +135,6 @@ def analyze_company_research(company_name: str) -> str:
     report = build_report(analysis)
 
     markdown = format_markdown(report)
-    # ==========================================================
-# Investment Decision
-# ==========================================================
-
-@mcp.tool()
-def get_investment_decision(company_name: str) -> dict:
-    """
-    Returns the personal investment decision for a portfolio holding.
-
-    Includes:
-    - Fundamental rating
-    - Valuation
-    - FCF quality
-    - DCF verdict
-    - Financial data quality
-    - Portfolio exposure
-    - Confidence
-    - Evidence
-    - Risks
-    """
-    decision = generate_investment_decision(
-        company_name
-    )
-
-    return to_python(decision)
-
     # ------------------------------------------------------
     # DCF
     # ------------------------------------------------------
@@ -194,6 +170,16 @@ def get_investment_decision(company_name: str) -> dict:
         )
 
     return markdown
+
+
+# ==========================================================
+# Investment Decision
+# ==========================================================
+
+@mcp.tool()
+def get_investment_decision(company_name: str) -> dict:
+    """Returns the personal investment decision for a portfolio holding."""
+    return to_python(generate_investment_decision(company_name))
 
 
 # ==========================================================
