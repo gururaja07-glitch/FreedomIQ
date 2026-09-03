@@ -96,9 +96,39 @@ def get_portfolio_investment_committee() -> PortfolioCommitteeResult:
         company_decisions.append(
             decision
         )
-
     # ------------------------------------------------------
-    # 4. Existing portfolio-level decisions
+    # 4. Portfolio quarterly momentum synthesis
+    # ------------------------------------------------------
+
+    quarterly_assessment_counts = {
+        "Positive": 0,
+        "Negative": 0,
+        "Neutral": 0,
+        "Unavailable": 0,
+    }
+
+    for decision in company_decisions:
+
+        assessment = (
+            decision.quarterly_assessment
+            or "Unavailable"
+        )
+
+        if assessment not in quarterly_assessment_counts:
+            assessment = "Unavailable"
+
+        quarterly_assessment_counts[assessment] += 1
+
+    quarterly_summary = (
+        f"Latest quarterly momentum across "
+        f"{len(company_decisions)} holdings: "
+        f"{quarterly_assessment_counts['Positive']} Positive, "
+        f"{quarterly_assessment_counts['Negative']} Negative, "
+        f"{quarterly_assessment_counts['Neutral']} Neutral, "
+        f"{quarterly_assessment_counts['Unavailable']} Unavailable."
+    )
+    # ------------------------------------------------------
+    # 5. Existing portfolio-level decisions
     # ------------------------------------------------------
 
     portfolio_actions = (
@@ -106,7 +136,7 @@ def get_portfolio_investment_committee() -> PortfolioCommitteeResult:
     )
 
     # ------------------------------------------------------
-    # 5. Portfolio synthesis
+    # 6. Portfolio synthesis
     # ------------------------------------------------------
 
     add_count = sum(
@@ -141,7 +171,7 @@ def get_portfolio_investment_committee() -> PortfolioCommitteeResult:
     )
 
     # ------------------------------------------------------
-    # 6. Committee confidence
+    # 7. Committee confidence
     # ------------------------------------------------------
 
     if not company_decisions:
@@ -170,7 +200,7 @@ def get_portfolio_investment_committee() -> PortfolioCommitteeResult:
             confidence = "Low"
 
     # ------------------------------------------------------
-    # 7. Prioritized action plan
+    # 8. Prioritized action plan
     # ------------------------------------------------------
 
     prioritized_actions = (
@@ -181,7 +211,7 @@ def get_portfolio_investment_committee() -> PortfolioCommitteeResult:
     )
 
     # ------------------------------------------------------
-    # 8. Return structured committee result
+    # 9. Return structured committee result
     # ------------------------------------------------------
 
     return PortfolioCommitteeResult(
@@ -190,4 +220,6 @@ def get_portfolio_investment_committee() -> PortfolioCommitteeResult:
         prioritized_actions=prioritized_actions,
         summary=summary,
         confidence=confidence,
+        quarterly_assessment_counts=quarterly_assessment_counts,
+        quarterly_summary=quarterly_summary,
     )

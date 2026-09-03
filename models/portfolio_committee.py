@@ -21,3 +21,5 @@ class PortfolioCommitteeResult:
     prioritized_actions: list[PortfolioAction]
     summary: str
     confidence: str
+    quarterly_assessment_counts: dict[str, int]
+    quarterly_summary: str
