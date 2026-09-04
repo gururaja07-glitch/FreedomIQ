@@ -7,13 +7,14 @@ from portfolio.loader import get_portfolio as legacy_get_portfolio
 from portfolio.metrics import calculate_metrics as legacy_calculate_metrics
 from portfolio.dashboard import get_portfolio_dashboard
 
-from services.portfolio_service import get_dashboard_data
 from services.review_service import get_portfolio_review
 from services.research_service import analyze_company
 
 from research.report import build_report
 from research.formatter import format_markdown
 from research.dcf import DCFEngine
+from tools.analytics import calculate_asset_allocation
+from tools.health import calculate_portfolio_health
 
 from tools.portfolio import get_portfolio
 from tools.analytics import calculate_metrics
@@ -28,6 +29,9 @@ from services.prepare_portfolio_data import prepare_portfolio_data
 from tools.analytics import calculate_portfolio_summary
 from tools.analytics import get_top_performers as top_performer
 from tools.analytics import get_top_losers as top_loser
+from tools.health import calculate_portfolio_health
+from tools.advisor import generate_portfolio_advice
+from tools.risk import calculate_portfolio_risk
 
 mcp = FastMCP("FreedomIQ")
 
@@ -85,17 +89,24 @@ def get_portfolio_health() -> dict:
     """
     Returns the portfolio health assessment.
     """
-    dashboard = get_dashboard_data()
-    return to_python(dashboard.health)
 
+    df = prepare_portfolio_data()
+    allocation = calculate_asset_allocation(df)
+    health = calculate_portfolio_health(df, allocation)
+
+    return to_python(health)
 
 @mcp.tool()
 def get_portfolio_advice() -> list:
     """
     Returns portfolio recommendations.
     """
-    dashboard = get_dashboard_data()
-    return to_python(dashboard.advisor)
+
+    df = prepare_portfolio_data()
+    allocation = calculate_asset_allocation(df)
+    advice = generate_portfolio_advice(df, allocation)
+
+    return to_python(advice)
 
 
 @mcp.tool()
@@ -103,9 +114,15 @@ def get_portfolio_risk() -> dict:
     """
     Returns portfolio risk analysis.
     """
-    dashboard = get_dashboard_data()
-    return to_python(dashboard.risk)
 
+    df = prepare_portfolio_data()
+    allocation = calculate_asset_allocation(df)
+    risk, overall = calculate_portfolio_risk(df, allocation)
+
+    return to_python({
+        "Risk": risk,
+        "Overall": overall,
+    })
 
 # ==========================================================
 # Complete Portfolio Review
@@ -230,10 +247,13 @@ def get_portfolio_score() -> dict:
     """
     Returns the current FreedomIQ portfolio health score.
     """
-    dashboard = get_dashboard_data()
+
+    df = prepare_portfolio_data()
+    allocation = calculate_asset_allocation(df)
+    health = calculate_portfolio_health(df, allocation)
 
     return {
-        "Health Score": dashboard.health["Total"]
+        "Health Score": health["Total"]
     }
 
 
@@ -246,23 +266,12 @@ def get_portfolio_ai_advice() -> list:
     """
     Returns portfolio recommendations.
     """
-    dashboard = get_dashboard_data()
 
-    return to_python(dashboard.advisor)
+    df = prepare_portfolio_data()
+    allocation = calculate_asset_allocation(df)
+    advice = generate_portfolio_advice(df, allocation)
 
-
-# ==========================================================
-# Complete Portfolio Dashboard
-# ==========================================================
-
-@mcp.tool()
-def get_portfolio_dashboard_data() -> dict:
-    """
-    Returns the complete FreedomIQ portfolio dashboard.
-    """
-    dashboard = get_dashboard_data()
-
-    return to_python(dashboard)
+    return to_python(advice)
 
 
 # ==========================================================
