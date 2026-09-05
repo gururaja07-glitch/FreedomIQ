@@ -6,16 +6,13 @@ from services.decision_service import (
 from portfolio.loader import get_portfolio as legacy_get_portfolio
 from portfolio.metrics import calculate_metrics as legacy_calculate_metrics
 from portfolio.dashboard import get_portfolio_dashboard
-
 from services.review_service import get_portfolio_review
 from services.research_service import analyze_company
-
 from research.report import build_report
 from research.formatter import format_markdown
 from research.dcf import DCFEngine
 from tools.analytics import calculate_asset_allocation
 from tools.health import calculate_portfolio_health
-
 from tools.portfolio import get_portfolio
 from tools.analytics import calculate_metrics
 from tools.serialization import to_python
@@ -32,10 +29,30 @@ from tools.analytics import get_top_losers as top_loser
 from tools.health import calculate_portfolio_health
 from tools.advisor import generate_portfolio_advice
 from tools.risk import calculate_portfolio_risk
+from services.capital_allocation_service import (
+    get_capital_allocation_plan as generate_capital_allocation_plan,
+)
 
 mcp = FastMCP("FreedomIQ")
 
+# ==========================================================
+# Capital Allocation
+# ==========================================================
 
+@mcp.tool()
+def get_capital_allocation_plan(
+    available_capital: float,
+) -> dict:
+    """
+    Returns a recommended allocation of new capital across
+    eligible existing portfolio holdings.
+    """
+
+    return to_python(
+        generate_capital_allocation_plan(
+            available_capital
+        )
+    )
 # ==========================================================
 # Portfolio Summary
 # ==========================================================

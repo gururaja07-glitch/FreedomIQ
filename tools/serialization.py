@@ -5,6 +5,8 @@ Converts NumPy and Pandas objects into native Python
 types that can be safely returned through MCP/JSON.
 """
 
+from dataclasses import asdict, is_dataclass
+
 import numpy as np
 import pandas as pd
 
@@ -13,6 +15,9 @@ def to_python(obj):
     """
     Recursively convert objects into JSON-friendly types.
     """
+
+    if is_dataclass(obj):
+        return to_python(asdict(obj))
 
     if isinstance(obj, dict):
         return {k: to_python(v) for k, v in obj.items()}
