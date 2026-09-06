@@ -110,12 +110,13 @@ def get_ticker(company_name: str) -> str:
     if key == "cash":
         return None
 
+    # Already a Yahoo Finance NSE ticker.
+    if key.endswith(".ns"):
+        return key.upper()
+
+    # Known company name or alias.
     if key in TICKERS:
         return TICKERS[key]
 
-    # Already a Yahoo ticker
-    if company_name.upper().endswith(".NS"):
-        return company_name.upper()
-
-    # Default to NSE
-    return company_name.upper() + ".NS"
+    # Default to NSE.
+    return key.upper() + ".NS"
