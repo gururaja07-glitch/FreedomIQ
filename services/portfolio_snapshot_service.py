@@ -116,3 +116,85 @@ def save_portfolio_snapshot(
         )
 
     return snapshot_path
+def load_portfolio_snapshot(
+    snapshot_date: str,
+) -> PortfolioSnapshot | None:
+    """
+    Load a portfolio snapshot for a specific date.
+    """
+
+    snapshot_path = (
+        SNAPSHOT_DIRECTORY
+        / f"{snapshot_date}.json"
+    )
+
+    if not snapshot_path.exists():
+        return None
+
+    with snapshot_path.open(
+        "r",
+        encoding="utf-8",
+    ) as file:
+
+        snapshot_data = json.load(file)
+
+    return PortfolioSnapshot(
+        **snapshot_data
+    )
+
+
+def load_latest_snapshot() -> PortfolioSnapshot | None:
+    """
+    Load the most recent portfolio snapshot.
+    """
+
+    _ensure_snapshot_directory()
+
+    snapshot_files = sorted(
+        SNAPSHOT_DIRECTORY.glob("*.json")
+    )
+
+    if not snapshot_files:
+        return None
+
+    latest_file = snapshot_files[-1]
+
+    with latest_file.open(
+        "r",
+        encoding="utf-8",
+    ) as file:
+
+        snapshot_data = json.load(file)
+
+    return PortfolioSnapshot(
+        **snapshot_data
+    )
+
+
+def load_previous_snapshot() -> PortfolioSnapshot | None:
+    """
+    Load the snapshot immediately before
+    the most recent snapshot.
+    """
+
+    _ensure_snapshot_directory()
+
+    snapshot_files = sorted(
+        SNAPSHOT_DIRECTORY.glob("*.json")
+    )
+
+    if len(snapshot_files) < 2:
+        return None
+
+    previous_file = snapshot_files[-2]
+
+    with previous_file.open(
+        "r",
+        encoding="utf-8",
+    ) as file:
+
+        snapshot_data = json.load(file)
+
+    return PortfolioSnapshot(
+        **snapshot_data
+    )

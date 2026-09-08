@@ -32,7 +32,9 @@ from tools.risk import calculate_portfolio_risk
 from services.capital_allocation_service import (
     get_capital_allocation_plan as generate_capital_allocation_plan,
 )
-
+from services.portfolio_change_service import (
+    compare_portfolio_state,
+)
 mcp = FastMCP("FreedomIQ")
 
 # ==========================================================
@@ -152,7 +154,20 @@ def review_portfolio() -> dict:
     """
     return get_portfolio_review()
 
+# ==========================================================
+# Portfolio Changes
+# ==========================================================
 
+@mcp.tool()
+def get_portfolio_changes() -> dict:
+    """
+    Returns meaningful changes detected between the latest
+    saved portfolio snapshot and the current portfolio state.
+    """
+
+    return to_python(
+        compare_portfolio_state()
+    )
 # ==========================================================
 # Company Research
 # ==========================================================
