@@ -35,7 +35,24 @@ from services.capital_allocation_service import (
 from services.portfolio_change_service import (
     compare_portfolio_state,
 )
+from services.daily_portfolio_review_service import (
+    get_daily_portfolio_review as generate_daily_portfolio_review,
+)
 mcp = FastMCP("FreedomIQ")
+
+# ==========================================================
+# Daily Portfolio Review
+# ==========================================================
+
+@mcp.tool()
+def get_daily_portfolio_review() -> dict:
+    """
+    Returns the complete daily FreedomIQ portfolio review.
+    """
+
+    return to_python(
+        generate_daily_portfolio_review()
+    )
 
 # ==========================================================
 # Capital Allocation
