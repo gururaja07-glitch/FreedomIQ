@@ -41,6 +41,9 @@ from services.daily_portfolio_review_service import (
 from services.daily_review_snapshot_service import (
     get_daily_review_history,
 )
+from services.daily_review_change_service import (
+    get_daily_review_changes,
+)
 mcp = FastMCP("FreedomIQ")
 
 # ==========================================================
@@ -369,6 +372,17 @@ def get_daily_portfolio_review_history(
 # ==========================================================
 # Start MCP Server
 # ==========================================================
+
+@mcp.tool()
+def get_daily_portfolio_review_changes() -> dict | None:
+    """
+    Compare the latest persisted daily review with
+    the previous persisted daily review.
+    """
+
+    return to_python(
+        get_daily_review_changes()
+    )
 
 if __name__ == "__main__":
     mcp.run()
