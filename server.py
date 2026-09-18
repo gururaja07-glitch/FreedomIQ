@@ -38,6 +38,9 @@ from services.portfolio_change_service import (
 from services.daily_portfolio_review_service import (
     get_daily_portfolio_review as generate_daily_portfolio_review,
 )
+from services.daily_review_snapshot_service import (
+    get_daily_review_history,
+)
 mcp = FastMCP("FreedomIQ")
 
 # ==========================================================
@@ -344,7 +347,25 @@ def get_portfolio_investment_committee() -> dict:
     return to_python(
         generate_portfolio_committee()
     )
+# ==========================================================
+# Daily Portfolio Review History
+# ==========================================================
 
+@mcp.tool()
+def get_daily_portfolio_review_history(
+    limit: int = 7,
+) -> list[dict]:
+    """
+    Returns recent historical FreedomIQ daily reviews.
+
+    Results are returned from newest to oldest.
+    """
+
+    return to_python(
+        get_daily_review_history(
+            limit
+        )
+    )
 # ==========================================================
 # Start MCP Server
 # ==========================================================

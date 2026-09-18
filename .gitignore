@@ -21,3 +21,6 @@ charts/*.jpg
 
 # Generated portfolio history
 data/portfolio_history/
+
+# Generated daily review history
+data/daily_review_history/
