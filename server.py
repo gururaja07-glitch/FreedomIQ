@@ -45,6 +45,9 @@ from services.daily_review_change_service import (
     get_daily_review_changes,
 )
 from services.daily_review_trend_service import get_daily_review_trends
+from services.daily_investor_brief_service import (
+    get_daily_investor_brief as build_daily_investor_brief,
+)
 mcp = FastMCP("FreedomIQ")
 
 # ==========================================================
@@ -389,6 +392,13 @@ def get_daily_portfolio_review_changes() -> dict | None:
 def get_daily_portfolio_review_trends(limit: int = 7):
     """Return historical trends across recent daily portfolio reviews."""
     return to_python(get_daily_review_trends(limit))
+
+@mcp.tool()
+def get_daily_investor_brief():
+    """Return the consolidated daily investor brief."""
+    return to_python(
+        build_daily_investor_brief()
+    )
 
 if __name__ == "__main__":
     mcp.run()
