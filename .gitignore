@@ -24,3 +24,6 @@ data/portfolio_history/
 
 # Generated daily review history
 data/daily_review_history/
+
+# Generated investor brief history
+data/investor_brief_history/

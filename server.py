@@ -48,6 +48,9 @@ from services.daily_review_trend_service import get_daily_review_trends
 from services.daily_investor_brief_service import (
     get_daily_investor_brief as build_daily_investor_brief,
 )
+from services.daily_investor_brief_snapshot_service import (
+    get_daily_investor_brief_history,
+)
 mcp = FastMCP("FreedomIQ")
 
 # ==========================================================
