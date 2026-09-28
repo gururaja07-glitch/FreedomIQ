@@ -60,6 +60,9 @@ from services.daily_investor_brief_trend_service import (
 from services.investor_decision_context_service import (
     get_investor_decision_context as load_investor_decision_context,
 )
+from services.investor_action_brief_service import (
+    get_investor_action_brief as load_investor_action_brief,
+)
 mcp = FastMCP("FreedomIQ")
 
 # ==========================================================
@@ -444,6 +447,15 @@ def get_investor_decision_context():
     return to_python(
         load_investor_decision_context()
     )
+
+
+@mcp.tool()
+def get_investor_action_brief():
+    """Return the consolidated investor action brief."""
+    return to_python(
+        load_investor_action_brief()
+    )
+
 if __name__ == "__main__":
     mcp.run()
 
