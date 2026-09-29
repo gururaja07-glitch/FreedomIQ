@@ -1,7 +1,9 @@
-import yfinance as yf
+from services.market_data.yahoo_provider import YahooMarketDataProvider
 
 
 NON_QUOTED_SECTORS = {"gold", "silver", "cash"}
+
+market_data_provider = YahooMarketDataProvider()
 
 
 def update_price(
@@ -20,20 +22,20 @@ def update_price(
         return current_price
 
     symbol = str(ticker or stock).strip().upper()
+
     if not symbol:
         return current_price
+
     if "." not in symbol:
         symbol = f"{symbol}.NS"
 
-    try:
-        data = yf.Ticker(symbol).history(period="1d")
-        if data.empty:
-            print(f"Price not found for {stock}. Using previous price.")
-            return current_price
-        return round(float(data["Close"].iloc[-1]), 2)
-    except Exception as error:
-        print(f"Error updating {stock}: {error}")
+    latest_price = market_data_provider.get_latest_close(symbol)
+
+    if latest_price is None:
+        print(f"Price not found for {stock}. Using previous price.")
         return current_price
+
+    return latest_price
 
 
 def update_prices(df):
